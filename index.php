@@ -8,21 +8,22 @@
 
 include 'model.php';
 $db = connect_db('localhost:3307', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
+$right_column = use_template('cards');
 
 $template = Array(
     1 => Array(
         'name' => 'Home',
-        'url' => 'DDWT18_FP/finalproject/'
+        'url' => 'DDWT18/final/'
     ));
 
 /* Landing page */
-if (new_route('/DDWT18_FP/finalproject/', 'get')) {
+if (new_route('/DDWT18/final/', 'get')) {
     /* Page info */
     $page_title = 'Home';
     $breadcrumbs = get_breadcrumbs([
         'DDWT18' => na('/DDWT18/', False),
-        'Week 2' => na('/DDWT18/finalproject/', False),
-        'Home' => na('/DDWT18/finalproject/', True)
+        'Final' => na('/DDWT18/final/', False),
+        'Home' => na('/DDWT18/final/', True)
     ]);
     $navigation = get_navigation($template, 1);
 
