@@ -204,6 +204,71 @@ function get_room_table($series, $pdo){
 }
 
 /**
+ * Adds a room to the database.
+ * @param object $pdo db object
+ * @param array $room_info post array
+ * @return array with feedback message
+ */
+function add_room($pdo, $room_info){
+    /* Check if all fields are set */
+    if (empty($room_info['Address'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Address field empty. Room not added'
+        ];
+    } elseif (empty($room_info['Type'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Type field empty. Room not added'
+        ];
+    } elseif (empty($room_info['Price'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Price field empty. Room not added'
+        ];
+    } elseif (empty($room_info['Size'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Size field empty. Room not added'
+        ];
+    }
+
+    /* Check data type*/
+    elseif (!is_numeric($room_info['Price'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Price field not numeric. Room not added'
+        ];
+    } elseif (!is_numeric($room_info['Size'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Size field not numeric. Room not added'
+        ];
+    }
+
+    /* Add room */
+    else {
+        $stmt = $pdo->prepare("INSERT INTO rooms (name, address, type, price, size) VALUES (?, ?, ?, ?)");
+        $stmt->execute([
+            $room_info['Address'],
+            $room_info['Type'],
+            $room_info['Price'],
+            $room_info['Size']
+        ]);
+        $inserted = $stmt->rowCount();
+        if ($inserted == 1) {
+            return [
+                'type' => 'success',
+                'message' => sprintf("Room at '%s' added!", $room_info['Address'])];
+        }
+    }
+    return [
+        'type' => 'danger',
+        'message' => 'There was an error. Room not added. Try it again.'
+    ];
+}
+
+/**
  * Pritty Print Array
  * @param $input
  */
