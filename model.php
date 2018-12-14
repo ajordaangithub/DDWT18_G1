@@ -149,3 +149,78 @@ function count_users($pdo) {
     $users = $stmt->rowCount();
     return $users;
 }
+
+/**
+ * Get array with all listed series from the database
+ * @param object $pdo database object
+ * @return array Associative array with all series
+ */
+function get_rooms($pdo){
+    $stmt = $pdo->prepare('SELECT * FROM rooms');
+    $stmt->execute();
+    $series = $stmt->fetchAll();
+    $series_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($series as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $series_exp;
+}
+
+/**
+ * Creats a Bootstrap table with a list of series
+ * @param PDO $pdo database object
+ * @param array $series with series from the db
+ * @return string
+ */
+function get_room_table($series, $pdo){
+    $table_exp = '
+    <table class="table table-hover">
+    <thead
+    <tr>
+        <th scope="col">Room</th>
+        <th scope="col">Added by</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>';
+    foreach($series as $key => $value){
+        $table_exp .= '
+        <tr>
+            <th scope="row">'.$value['address'].'</th>
+            <td>'.(get_username($pdo, $value['owner'])['full_name']).'</td>
+            <td><a href="/DDWT18/final/room/?room_id='.$value['id'].'&user_id='.$value['owner'].'" role="button" class="btn btn-primary">More info</a></td>
+        </tr>
+        ';
+    }
+    $table_exp .= '
+    </tbody>
+    </table>
+    ';
+    return $table_exp;
+}
+
+/**
+ * Pritty Print Array
+ * @param $input
+ */
+function p_print($input){
+    echo '<pre>';
+    print_r($input);
+    echo '</pre>';
+}
+
+/**
+ * Get the full name of a user corresponding with a specific id
+ * @param PDO $pdo database object
+ * @return mixed
+ */
+function get_username($pdo, $user_id) {
+    $stmt = $pdo->prepare("SELECT full_name FROM users WHERE id=?");
+    $stmt->execute([$user_id]);
+    $username = $stmt->fetch();
+    return $username;
+}
