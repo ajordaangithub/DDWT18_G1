@@ -124,3 +124,28 @@ function get_navigation($navigation_tpl, $active_id){
     </nav>';
     return $navigation_exp;
 }
+
+/**
+ * Count the number of series listed on Series Overview
+ * @param object $pdo database object
+ * @return mixed
+ */
+function count_rooms($pdo){
+    /* Get series */
+    $stmt = $pdo->prepare('SELECT * FROM rooms');
+    $stmt->execute();
+    $series = $stmt->rowCount();
+    return $series;
+}
+
+/**
+ * Count the current number of users in the database
+ * @param PDO $pdo database object
+ * @return mixed
+ */
+function count_users($pdo) {
+    $stmt = $pdo->prepare("SELECT * FROM users");
+    $stmt->execute();
+    $users = $stmt->rowCount();
+    return $users;
+}

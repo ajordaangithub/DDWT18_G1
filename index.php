@@ -8,6 +8,8 @@
 
 include 'model.php';
 $db = connect_db('localhost:3307', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
+$nbr_rooms = count_rooms($db);
+$nbr_users = count_users($db);
 $right_column = use_template('cards');
 
 $template = Array(
