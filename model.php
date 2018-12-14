@@ -177,7 +177,7 @@ function get_rooms($pdo){
  * @return string
  */
 function get_room_table($series, $pdo){
-    $table_exp = '
+    /*$table_exp = '
     <table class="table table-hover">
     <thead
     <tr>
@@ -200,7 +200,22 @@ function get_room_table($series, $pdo){
     </tbody>
     </table>
     ';
-    return $table_exp;
+    return $table_exp;*/
+    $card_exp = '<div class="card-body"> </div>';
+    foreach ($series as $key => $value) {
+        $card_exp .= '<div class="card" style="width: 500px;">
+  <img class="card-img-top" src="../house.jpg" alt="Card image cap" height="350px">
+  <div class="card-body">
+    <h5 class="card-title"><i class="fas fa-home"></i> '.$value['address'].'</h5>
+    <p class="card-text"><i class="fas fa-user"></i> '.get_username($pdo,$value['owner'])['full_name'].'</p>
+    <p class="card-text"><i class="fas fa-euro-sign"></i> '.$value['price'].'</p>
+    <p class="card-text"><i class="fas fa-chair"></i> '.$value['size'].' m2</p>
+    <a href="/DDWT18/final/room/?room_id='.$value['id'].'" role="button" class="btn btn-primary">More info</a>
+  </div>
+</div>
+';
+    }
+    return $card_exp;
 }
 
 /**
