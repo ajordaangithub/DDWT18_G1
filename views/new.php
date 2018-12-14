@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
     <!-- Own CSS -->
-    <link rel="stylesheet" href="/DDWT18/week2/css/main.css">
+    <link rel="stylesheet" href="/DDWT18/final/css/main.css">
 
     <title><?= $page_title ?></title>
 </head>
@@ -35,30 +35,46 @@
             <p><?= $page_content ?></p>
             <form action="<?= $form_action ?>" method="POST">
                 <div class="form-group row">
-                    <label for="inputName" class="col-sm-2 col-form-label">Name</label>
+                    <label for="inputAddress" class="col-sm-2 col-form-label">Address</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="inputName" name="Name" value="<?php if (isset($serie_info)){echo $serie_info['name'];} ?>" required>
+                        <input type="text" class="form-control" id="inputAddress" name="Address"
+                               value="<?php if (isset($room_info)){echo $room_info['address'];} ?>" required>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="inputCreator" class="col-sm-2 col-form-label">Creator</label>
+                    <label for="inputType" class="col-sm-2 col-form-label">Type</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="inputCreator" name="Creator" value="<?php if (isset($serie_info)){echo $serie_info['creator'];} ?>" required>
+                        <input type="text" class="form-control" id="inputType" name="Type"
+                               value="<?php if (isset($room_info)){echo $room_info['type'];} ?>" required>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="inputSeasons" class="col-sm-2 col-form-label">Seasons</label>
+                    <label for="inputPrice" class="col-sm-2 col-form-label">Price</label>
                     <div class="col-sm-10">
-                        <input type="number" class="form-control" id="inputCreator" name="Seasons" value="<?php if (isset($serie_info)){echo $serie_info['seasons'];} ?>" required>
+                        <input type="number" class="form-control" id="inputPrice" name="Price"
+                               value="<?php if (isset($room_info)){echo $room_info['price'];} ?>" required>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label for="inputSize" class="col-sm-2 col-form-label">Size (m<sup>2</sup>)</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" id="inputSize" name="Size"
+                               value="<?php if (isset($room_info)){echo $room_info['size'];} ?>" required>
+                    </div>
+                </div>
+                <!-- ToDo: uncomment when abstract implented in DB
                 <div class="form-group row">
                     <label for="inputAbstract" class="col-sm-2 col-form-label">Abstract</label>
                     <div class="col-sm-10">
-                        <textarea class="form-control" id="inputAbstract" rows="3" name="Abstract" required><?php if (isset($serie_info)){echo $serie_info['abstract'];} ?></textarea>
+                        <textarea class="form-control" id="inputAbstract" rows="3" name="Abstract" required>
+                        <?php // if (isset($room_info)){echo $room_info['abstract'];} ?></textarea>
                     </div>
-                </div>
-                <?php if(isset($serie_id)){ ?><input type="hidden" name="serie_id" value="<?php echo $serie_id ?>"><?php } ?>
+                </div> -->
+
+                <!-- ToDo: uncomment when user type of user check implemented
+                <?php // if(isset($serie_id)){ ?> <input type="hidden" name="serie_id" value=" <?php // echo $serie_id ?>"><?php // } ?>
+                -->
+
                 <div class="form-group row">
                     <div class="col-sm-10">
                         <button type="submit" class="btn btn-primary"><?= $submit_btn ?></button>
