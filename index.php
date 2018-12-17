@@ -137,7 +137,7 @@ elseif (new_route('/DDWT18/final/add/', 'get')) {
     /* Check if logged in */
     //ToDo: uncomment if login functionality works
 //    if ( !check_login() ) {
-//        redirect('/DDWT18/week2/login/');
+//        redirect('/DDWT18/final/login/');
 //    }
 
     /* Page info */
@@ -164,19 +164,74 @@ elseif (new_route('/DDWT18/final/add/', 'get')) {
     include use_template('new');
 }
 
-/* Add serie POST */
+/* Add room POST */
 elseif (new_route('/DDWT18/final/add/', 'post')) {
     /* Check if logged in */
     //ToDo: uncomment if login functionality works
 //    if ( !check_login() ) {
-//        redirect('/DDWT18/week2/login/');
+//        redirect('/DDWT18/final/login/');
 //    }
 
-    /* Add serie to database */
+    /* Add room to database */
     $feedback = add_room($db, $_POST);
 
-    /* Redirect to serie GET route */
+    /* Redirect to room GET route */
     redirect(sprintf('/DDWT18/final/add/?error_msg=%s', json_encode($feedback)));
+}
+
+/* Edit room GET */
+elseif (new_route('/DDWT18/final/edit/', 'get')) {
+    /* Check if logged in */
+    //ToDo: uncomment if login functionality works
+//    if ( !check_login() ) {
+//        redirect('/DDWT18/final/login/');
+//    }
+
+    /* Get room info from db */
+    $room_id = $_GET['room_id'];
+    $room_info = get_roominfo($db, $room_id);
+
+    /* Page info */
+    $page_title = 'Edit Room';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT18' => na('/DDWT18/', False),
+        'Week 2' => na('/DDWT18/final/', False),
+        sprintf("Edit Room %s", $room_info['address']) => na('/DDWT18/final/new/', True)
+    ]);
+    $navigation = get_navigation($template, 0);
+
+    /* Page content */
+    $page_subtitle = sprintf("Edit %s", $room_info['name']);
+    $page_content = 'Edit the room below.';
+    $submit_btn = "Edit Room";
+    $form_action = '/DDWT18/final/edit/';
+
+    /* Get error message from POST route */
+    if ( isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+
+    /* Choose Template */
+    include use_template('new');
+}
+
+/* Edit room POST */
+elseif (new_route('/DDWT18/final/edit/', 'post')) {
+    /* Check if logged in */
+    //ToDo: uncomment if login functionality works
+//    if ( !check_login() ) {
+//        redirect('/DDWT18/final/login/');
+//    }
+
+    /* Get room info from db */
+    $room_id = $_POST['room_id'];
+
+    /* Update room to database */
+    $feedback = update_room($db, $_POST);
+
+    /* Redirect to room GET route */
+    redirect(sprintf('/DDWT18/final/room/?room_id='.$room_id.'?error_msg=%s', json_encode($feedback)));
+    /* TODO: show error msg after updating */
 }
 
 /* Myaccount GET */
