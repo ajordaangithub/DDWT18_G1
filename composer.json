@@ -1,0 +1,18 @@
+{
+  "name": "jakkermans/DDWT18_week3",
+  "description": "description_text",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Jannick Akkermans",
+      "email": "j.c.akkermans@student.rug.nl"
+    }
+  ],
+  "require": {
+    "bramus/router": "1.3",
+    "json/json": "dev-master",
+    "ext-json": "*",
+    "ext-pdo": "*"
+  }
+}
