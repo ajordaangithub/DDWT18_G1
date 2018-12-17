@@ -201,7 +201,7 @@ elseif (new_route('/DDWT18/final/edit/', 'get')) {
     $navigation = get_navigation($template, 0);
 
     /* Page content */
-    $page_subtitle = sprintf("Edit %s", $room_info['name']);
+    $page_subtitle = sprintf("Edit %s", $room_info['address']);
     $page_content = 'Edit the room below.';
     $submit_btn = "Edit Room";
     $form_action = '/DDWT18/final/edit/';
