@@ -262,13 +262,14 @@ function add_room($pdo, $room_info){
     }
 
     /* Add room */
+    // ToDO: add owner to this list (dependant on login functionality)
     else {
-        $stmt = $pdo->prepare("INSERT INTO rooms (name, address, type, price, size) VALUES (?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO rooms (address, type, price, size, owner) VALUES (?, ?, ?, ?, 1)");
         $stmt->execute([
             $room_info['Address'],
             $room_info['Type'],
             $room_info['Price'],
-            $room_info['Size']
+            $room_info['Size'],
         ]);
         $inserted = $stmt->rowCount();
         if ($inserted == 1) {
