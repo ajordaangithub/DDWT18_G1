@@ -203,7 +203,7 @@ function get_room_table($series, $pdo){
     return $table_exp;*/
     $card_exp = '<div class="card-body"> </div>';
     foreach ($series as $key => $value) {
-        $card_exp .= '<div class="card" style="width: 500px;">
+        $card_exp .= '<div class="card" id="overview-card" style="width: 350px;">
   <img class="card-img-top" src="../house.jpg" alt="Card image cap" height="350px">
   <div class="card-body">
     <h5 class="card-title"><i class="fas fa-home"></i> '.$value['address'].'</h5>
