@@ -401,3 +401,70 @@ function get_roominfo($pdo, $serie_id){
     }
     return $serie_info_exp;
 }
+
+function register_user($pdo, $form_data){
+    /* Check if all fields are set */
+    if (
+        empty($form_data['username']) or
+        empty($form_data['password']) or
+        empty($form_data['fullname']) or
+        empty($form_data['birthdate']) or
+        empty($form_data['biography']) or
+        empty($form_data['profession']) or
+        empty($form_data['language']) or
+        empty($form_data['email']) or
+        empty($form_data['phone']) or
+        empty($form_data['type'])
+    ) {
+        return [
+            'type' => 'danger',
+            'message' => 'You should enter a username, password, first- and
+last name, birthdate, biography, profession, language, email, phone and type of user.'
+        ];
+    }
+
+    /* Check if user already exists */
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+    $stmt->execute([$form_data['username']]);
+    $user = $stmt->rowCount();
+    if ($user){
+        return [
+            'type' => 'danger',
+            'message' => 'This username is already in usage.'
+        ];
+    }
+    $password =  password_hash($form_data['password'], PASSWORD_DEFAULT);
+
+    /* Add Serie */
+    try {
+        $stmt = $pdo->prepare('INSERT INTO users (username, password, full_name,
+birth_date, role, biography, profession, language, email, phonenumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt->execute([$form_data['username'], $password, $form_data['fullname'],
+            $form_data['birthdate'], $form_data['type'], $form_data['biography'], $form_data['profession'], $form_data['language'], $form_data['email'], $form_data['phone'] ]);
+        $user_id = $pdo->lastInsertId();
+    } catch (PDOException $e) {
+        return [
+            'type' => 'danger',
+            'message' => sprintf('There was an error: %s', $e->getMessage())
+        ];
+    }
+    $_SESSION['user_id'] = $user_id;
+    return [
+        'type' => 'success',
+        'message' => "you're registered."
+    ];
+}
+
+function get_error($feedback){
+    $feedback = json_decode($feedback, True);
+    $error_exp = '
+        <div class="alert alert-'.$feedback['type'].'" role="alert">
+            '.$feedback['message'].'
+        </div>';
+    return $error_exp;
+}
+
+function redirect($location){
+    header(sprintf('Location: %s', $location));
+    die();
+}

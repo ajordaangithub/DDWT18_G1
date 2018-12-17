@@ -35,7 +35,7 @@
 
             <div class="pd-15">&nbsp;</div>
 
-            <form action="/DDWT18/week2/register/" method="POST">
+            <form action="/DDWT18/final/register/" method="POST">
                 <div class="form-group">
                     <label for="inputUsername">Username</label>
                     <input type="text" class="form-control" id="inputUsername" placeholder="j.jansen" name="username" required>
@@ -46,12 +46,36 @@
                 </div>
                 <div class="form-group">
                     <label for="inputUsername">First name</label>
-                    <input type="text" class="form-control" id="inputUsername" placeholder="Jan" name="firstname" required>
+                    <input type="text" class="form-control" id="inputUsername" placeholder="Jan Jansen" name="fullname" required>
                 </div>
                 <div class="form-group">
                     <label for="inputUsername">Last name</label>
-                    <input type="text" class="form-control" id="inputUsername" placeholder="Jansen" name="lastname" required>
+                    <input type="date" class="form-control" id="inputUsername" name="birthdate" required>
                 </div>
+                <div class="form-group row">
+                    <label for="inputAbstract" class="col-sm-2 col-form-label">Biography</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" id="inputAbstract" rows="3" name="biography" required></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Study/Profession</label>
+                    <input type="text" class="form-control" id="inputUsername" placeholder="Economics" name="profession" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Language</label>
+                    <input type="text" class="form-control" id="inputUsername" placeholder="Dutch" name="language" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Email</label>
+                    <input type="email" class="form-control" id="inputUsername" placeholder="janjansen@gmail.com" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Phone number</label>
+                    <input type="tel" class="form-control" id="inputUsername" placeholder="0612345678" name="phone" required>
+                </div>
+                <input type="radio" name="type" value="1" checked> Owner  &nbsp;
+                <input type="radio" name="type" value="2"> Tenant<br><br>
                 <button type="submit" class="btn btn-primary">Register now</button>
             </form>
 

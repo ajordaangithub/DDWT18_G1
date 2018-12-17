@@ -6,6 +6,8 @@
  * Time: 15:25
  */
 
+session_start();
+
 include 'model.php';
 $db = connect_db('localhost:3307', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
 $nbr_rooms = count_rooms($db);
@@ -31,7 +33,7 @@ $template = Array(
     ),
     5 => Array(
         'name' => 'Register',
-        'url' => '/DDWT18/week2/register/'
+        'url' => '/DDWT18/final/register/'
     ),
     6 => Array(
         'name' => 'Login',
@@ -127,4 +129,32 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
     }
     /* Choose Template */
     include use_template('room');
+}
+
+elseif (new_route('/DDWT18/final/register/', 'get')) {
+    /* Page info */
+    $page_title = 'Register';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT18' => na('/DDWT18/', False),
+        'Final' => na('/DDWT18/final/', False),
+        'Register' => na('/DDWT18/final/register', True)
+    ]);
+    $navigation = get_navigation($template, 5);
+
+    /* Page content */
+    $page_subtitle = 'Register your account here';
+
+    if ( isset($_GET['error_msg']) ) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+
+    /* Choose Template */
+    include use_template('register');
+}
+
+elseif (new_route('/DDWT18/final/register/', 'post')) {
+    $error_msg = register_user($db, $_POST);
+    redirect(sprintf('/DDWT18/final/register/?error_msg=%s',
+        json_encode($error_msg)));
+    include use_template('register');
 }
