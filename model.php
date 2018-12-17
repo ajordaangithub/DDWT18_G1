@@ -225,26 +225,26 @@ function get_room_table($series, $pdo){
  * @return array with feedback message
  */
 function add_room($pdo, $room_info){
-    /* Check if all fields are set */
+    /* Check if fields are correctly set */
     if (empty($room_info['Address'])){
         return [
             'type' => 'danger',
-            'message' => 'Address field empty. Room not added'
+            'message' => 'Address field empty. Room not added.'
         ];
     } elseif (empty($room_info['Type'])){
         return [
             'type' => 'danger',
-            'message' => 'Type field empty. Room not added'
+            'message' => 'Type field empty. Room not added.'
         ];
     } elseif (empty($room_info['Price'])){
         return [
             'type' => 'danger',
-            'message' => 'Price field empty. Room not added'
+            'message' => 'Price field empty. Room not added.'
         ];
     } elseif (empty($room_info['Size'])){
         return [
             'type' => 'danger',
-            'message' => 'Size field empty. Room not added'
+            'message' => 'Size field empty. Room not added.'
         ];
     }
 
@@ -252,12 +252,12 @@ function add_room($pdo, $room_info){
     elseif (!is_numeric($room_info['Price'])){
         return [
             'type' => 'danger',
-            'message' => 'Price field not numeric. Room not added'
+            'message' => 'Price field not numeric. Room not added.'
         ];
     } elseif (!is_numeric($room_info['Size'])){
         return [
             'type' => 'danger',
-            'message' => 'Size field not numeric. Room not added'
+            'message' => 'Size field not numeric. Room not added.'
         ];
     }
 
@@ -281,6 +281,83 @@ function add_room($pdo, $room_info){
     return [
         'type' => 'danger',
         'message' => 'There was an error. Room not added. Try it again.'
+    ];
+}
+
+function update_room($pdo, $room_info) {
+    /* Check if fields are correctly set */
+    if (empty($room_info['Address'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Address field empty. Room not updated.'
+        ];
+    } elseif (empty($room_info['Type'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Type field empty. Room not updated.'
+        ];
+    } elseif (empty($room_info['Price'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Price field empty. Room not updated.'
+        ];
+    } elseif (empty($room_info['Size'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Size field empty. Room not updated.'
+        ];
+    } elseif (empty($room_info['room_id'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Room id empty. Room not updated.'
+        ];
+    }
+
+    /* Check data type*/
+    elseif (!is_numeric($room_info['Price'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Price field not numeric. Room not updated.'
+        ];
+    } elseif (!is_numeric($room_info['Size'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Size field not numeric. Room not updated.'
+        ];
+    }
+
+    //Todo: uncomment this when login functionality is added.
+//    /* Check who added the room */
+//    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
+//    $stmt->execute([$room_info['room_id']]);
+//    $room = $stmt->fetch();
+//    if ( $room['owner'] != get_user_id()){
+//        return [
+//            'type' => 'danger',
+//            'message' => sprintf("You are not allowed to edit this, since this series was added by %s", $room['name'])
+//        ];
+//    }
+
+    /* Update room */
+    else {
+        $stmt = $pdo->prepare("UPDATE rooms SET address = ?, type = ?, price = ?, size = ? WHERE id = ?");
+        $stmt->execute([
+            $room_info['Address'],
+            $room_info['Type'],
+            $room_info['Price'],
+            $room_info['Size'],
+            $room_info['room_id']
+        ]);
+        $inserted = $stmt->rowCount();
+        if ($inserted == 1) {
+            return [
+                'type' => 'success',
+                'message' => sprintf("Room at '%s' updated!", $room_info['Address'])];
+        }
+    }
+    return [
+        'type' => 'danger',
+        'message' => 'There was an error. Room not updated. Try it again.'
     ];
 }
 
