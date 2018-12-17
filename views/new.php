@@ -70,10 +70,9 @@
                         <?php // if (isset($room_info)){echo $room_info['abstract'];} ?></textarea>
                     </div>
                 </div> -->
+                
+                <?php if(isset($room_id)){ ?> <input type="hidden" name="room_id" value=" <?php echo $room_id ?>"><?php } ?>
 
-                <!-- ToDo: uncomment when user type of user check implemented
-                <?php // if(isset($serie_id)){ ?> <input type="hidden" name="serie_id" value=" <?php // echo $serie_id ?>"><?php // } ?>
-                -->
 
                 <div class="form-group row">
                     <div class="col-sm-10">
