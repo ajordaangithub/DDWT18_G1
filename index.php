@@ -86,3 +86,45 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
     /* Choose Template */
     include use_template('main');
 }
+    /* Single Serie */
+elseif (new_route('/DDWT18/final/room/', 'get')) {
+        /* Get Number of Series */
+    /*$current_user = get_user_id();
+*/
+    /* Get series from db */
+    $room_id = $_GET['room_id'];
+    $room_info = get_roominfo($db, $room_id);
+    $userid = $room_info['owner'];
+
+    /*if ($current_user == $serie_info['user']) {
+        $display_buttons = True;
+    } else {
+        $display_buttons = False;
+    }*/
+
+    /*For now, $display_buttons is true. Has to be altered when authentication is done.*/
+    $display_buttons = True;
+
+    /* Page info */
+    $page_title = $room_info['address'];
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT18' => na('/DDWT18/', False),
+        'Final' => na('/DDWT18/final/', False),
+        'Overview' => na('/DDWT18/final/overview/', False),
+        $room_info['address'] => na('/DDWT18/final/serie/?serie_id='.$room_id, True)
+    ]);
+    $navigation = get_navigation($template, 2);
+
+    /* Page content */
+    $page_subtitle = sprintf("Information about %s", $room_info['address']);
+    $page_content = $room_info['type'];
+    $nbr_seasons = $room_info['price'];
+    $creators = $room_info['size'];
+    $added_by = (get_username($db, $userid)['full_name']);
+
+    if ( isset($_GET['error_msg']) ) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    /* Choose Template */
+    include use_template('room');
+}

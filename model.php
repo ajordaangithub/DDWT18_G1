@@ -305,3 +305,22 @@ function get_username($pdo, $user_id) {
     $username = $stmt->fetch();
     return $username;
 }
+
+/**
+ * Generates an array with serie information
+ * @param object $pdo db object
+ * @param int $serie_id id from the serie
+ * @return mixed
+ */
+function get_roominfo($pdo, $serie_id){
+    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
+    $stmt->execute([$serie_id]);
+    $serie_info = $stmt->fetch();
+    $serie_info_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($serie_info as $key => $value){
+        $serie_info_exp[$key] = htmlspecialchars($value);
+    }
+    return $serie_info_exp;
+}
