@@ -114,7 +114,7 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
         'DDWT18' => na('/DDWT18/', False),
         'Final' => na('/DDWT18/final/', False),
         'Overview' => na('/DDWT18/final/overview/', False),
-        $room_info['address'] => na('/DDWT18/final/serie/?serie_id='.$room_id, True)
+        $room_info['address'] => na('/DDWT18/final/room/?room='.$room_id, True)
     ]);
     $navigation = get_navigation($template, 2);
 
@@ -195,7 +195,7 @@ elseif (new_route('/DDWT18/final/edit/', 'get')) {
     $page_title = 'Edit Room';
     $breadcrumbs = get_breadcrumbs([
         'DDWT18' => na('/DDWT18/', False),
-        'Week 2' => na('/DDWT18/final/', False),
+        'Final' => na('/DDWT18/final/', False),
         sprintf("Edit Room %s", $room_info['address']) => na('/DDWT18/final/new/', True)
     ]);
     $navigation = get_navigation($template, 0);
