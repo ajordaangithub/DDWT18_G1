@@ -37,7 +37,7 @@ $template = Array(
     ),
     6 => Array(
         'name' => 'Login',
-        'url' => '/DDWT18/week2/login/'
+        'url' => '/DDWT18/final/login/'
     ));;
 
 /* Landing page */
@@ -134,8 +134,9 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
 /* Myaccount GET */
 elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
     /* page info */
-    //$user_id = get_user_id();
-    //$user = get_user_name($db, $user_id);
+    $user = get_user_id();
+    /*$user_id = get_user_id();
+    $user = get_user_name($db, $user_id); */
     $page_title = 'My account Placeholder';
     $breadcrumbs = get_breadcrumbs([
         'DDWT18' => na('/DDWT18/', False),
@@ -180,4 +181,48 @@ elseif (new_route('/DDWT18/final/register/', 'post')) {
     redirect(sprintf('/DDWT18/final/register/?error_msg=%s',
         json_encode($error_msg)));
     include use_template('register');
+}
+
+elseif (new_route('/DDWT18/final/login/', 'get')) {
+    if ( check_login() ) {
+        redirect('/DDWT18/final/myaccount/');
+    }
+    /* Page info */
+    $page_title = 'Login';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT18' => na('/DDWT18/', False),
+        'Final' => na('/DDWT18/final/', False),
+        'Login' => na('/DDWT18/final/login', True)
+    ]);
+    $navigation = get_navigation($template, 3);
+
+    /* Page content */
+    $page_subtitle = 'Please, login here';
+
+    /* Get error msg from POST route */
+    if ( isset($_GET['error_msg']) ) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    /* Choose Template */
+    include use_template('login');
+}
+
+elseif (new_route('/DDWT18/final/login/', 'post')) {
+    /* Register user */
+    $error_msg = login_user($db, $_POST);
+    /* Redirect to homepage */
+    if ($error_msg['type'] == "success") {
+        redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s',
+            json_encode($error_msg)));
+    } else {
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+
+}
+
+elseif (new_route('/DDWT18/final/logout/', 'get')) {
+    $error_msg = logout_user($db);
+    redirect(sprintf('/DDWT18/final/?error_msg=%s',
+        json_encode($error_msg)));
 }

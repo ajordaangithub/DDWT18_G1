@@ -468,3 +468,64 @@ function redirect($location){
     header(sprintf('Location: %s', $location));
     die();
 }
+
+function login_user($pdo, $form_data) {
+    if (
+        empty($form_data['username']) or
+        empty($form_data['password'])
+    ) {
+        return [
+            'type' => 'danger',
+            'message' => 'You should enter a username and password.'
+        ];
+    }
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+    $stmt->execute([$form_data['username']]);
+    $exist = $stmt->rowCount();
+    $user = $stmt->fetch();
+    if (!$exist) {
+        return [
+            'type' => 'danger',
+            'message' => 'Wrong username.'
+        ];
+    } elseif (!password_verify($form_data['password'], $user['password'])) {
+        return [
+            'type' => 'danger',
+            'message' => 'Wrong password.'
+        ];
+    }
+    else {
+        $_SESSION['userid'] = $user['id'];
+        return [
+            'type' => 'success',
+            'message' => 'You are logged in.'
+        ];
+    }
+}
+
+function check_login(){
+    if (isset($_SESSION['userid'])){
+        return True;
+    } else {
+        return False;
+    }
+}
+
+function get_user_id(){
+    if (isset($_SESSION['user_id'])){
+        return $_SESSION['user_id'];
+    } else {
+        return False;
+    }
+}
+
+function logout_user($pdo) {
+    $user = $_SESSION['user_id'];
+    unset($_SESSION['user_id']);
+    if(empty($_SESSION['user_id'])) {
+        return [
+            'type' => 'success',
+            'message' => "You're logged out"
+        ];
+    }
+}

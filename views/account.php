@@ -47,7 +47,7 @@
                 </div>
                 <div class="card-body">
                     <p>You're logged in to Series Overview.</p>
-                    <a href="/DDWT18/week2/logout/" class="btn btn-primary">Logout</a>
+                    <a href="/DDWT18/final/logout/" class="btn btn-primary">Logout</a>
                 </div>
             </div>
         </div>
