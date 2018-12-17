@@ -45,11 +45,11 @@
                     <input type="password" class="form-control" id="inputPassword" placeholder="******" name="password" required>
                 </div>
                 <div class="form-group">
-                    <label for="inputUsername">First name</label>
+                    <label for="inputUsername">Name</label>
                     <input type="text" class="form-control" id="inputUsername" placeholder="Jan Jansen" name="fullname" required>
                 </div>
                 <div class="form-group">
-                    <label for="inputUsername">Last name</label>
+                    <label for="inputUsername">Birthdate</label>
                     <input type="date" class="form-control" id="inputUsername" name="birthdate" required>
                 </div>
                 <div class="form-group row">
@@ -71,7 +71,7 @@
                     <input type="email" class="form-control" id="inputUsername" placeholder="janjansen@gmail.com" name="email" required>
                 </div>
                 <div class="form-group">
-                    <label for="inputUsername">Phone number</label>
+                    <label for="inputUsername">Phone</label>
                     <input type="tel" class="form-control" id="inputUsername" placeholder="0612345678" name="phone" required>
                 </div>
                 <input type="radio" name="type" value="1" checked> Owner  &nbsp;
