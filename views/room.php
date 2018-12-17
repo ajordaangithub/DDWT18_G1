@@ -55,11 +55,11 @@
             <?php if ($display_buttons) {?>
                 <div class="row">
                     <div class="col-sm-2">
-                        <a href="/DDWT18/week2/edit/?serie_id=<?= $serie_id ?>&user_id=<?= $_GET['user_id']?>" role="button" class="btn btn-warning">Edit</a>
+                        <a href="/DDWT18/final/edit/?room_id=<?= $room_id ?>&user_id=<?= $_GET['room_id']?>" role="button" class="btn btn-warning">Edit</a>
                     </div>
                     <div class="col-sm-2">
-                        <form action="/DDWT18/week2/remove/" method="POST">
-                            <input type="hidden" value="<?= $serie_id ?>" name="serie_id">
+                        <form action="/DDWT18/final/remove/" method="POST">
+                            <input type="hidden" value="<?= $room_id ?>" name="room_id">
                             <button type="submit" class="btn btn-danger">Remove</button>
                         </form>
                     </div>
