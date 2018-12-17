@@ -9,7 +9,7 @@
 session_start();
 
 include 'model.php';
-$db = connect_db('localhost:3307', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
+$db = connect_db('localhost:3306', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
 $nbr_rooms = count_rooms($db);
 $nbr_users = count_users($db);
 $right_column = use_template('cards');
@@ -29,7 +29,7 @@ $template = Array(
     ),
     4 => Array(
         'name' => 'My Account',
-        'url' => '/DDWT18/week2/myaccount/'
+        'url' => '/DDWT18/final/myaccount/'
     ),
     5 => Array(
         'name' => 'Register',
@@ -130,6 +130,29 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
     /* Choose Template */
     include use_template('room');
 }
+
+/* Myaccount GET */
+elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
+    /* page info */
+    //$user_id = get_user_id();
+    //$user = get_user_name($db, $user_id);
+    $page_title = 'My account Placeholder';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT18' => na('/DDWT18/', False),
+        'Final' => na('/DDWT18/final/', False),
+        'My Account' => na('/DDWT18/final/myaccount', True)
+    ]);
+    $navigation = get_navigation($template, 3);
+
+    /* page content */
+    $page_subtitle = sprintf("My account page");
+    $page_content = 'View your account';
+
+    /* Choose Template */
+    include use_template('account');
+}
+
+
 
 elseif (new_route('/DDWT18/final/register/', 'get')) {
     /* Page info */
