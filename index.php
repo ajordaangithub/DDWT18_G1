@@ -9,7 +9,7 @@
 session_start();
 
 include 'model.php';
-$db = connect_db('localhost:3306', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
+$db = connect_db('localhost:3307', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
 $nbr_rooms = count_rooms($db);
 $nbr_users = count_users($db);
 $right_column = use_template('cards');
@@ -24,7 +24,7 @@ $template = Array(
         'url' => '/DDWT18/final/overview/'
     ),
     3 => Array(
-        'name' => 'Add Serie',
+        'name' => 'Add Room',
         'url' => '/DDWT18/final/add/'
     ),
     4 => Array(
@@ -88,7 +88,8 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
     /* Choose Template */
     include use_template('main');
 }
-    /* Single Serie */
+
+/* Single Room */
 elseif (new_route('/DDWT18/final/room/', 'get')) {
         /* Get Number of Series */
     /*$current_user = get_user_id();
@@ -129,6 +130,53 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
     }
     /* Choose Template */
     include use_template('room');
+}
+
+/* Add Room GET */
+elseif (new_route('/DDWT18/final/add/', 'get')) {
+    /* Check if logged in */
+    //ToDo: uncomment if login functionality works
+//    if ( !check_login() ) {
+//        redirect('/DDWT18/week2/login/');
+//    }
+
+    /* Page info */
+    $page_title = 'Add Room';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT18' => na('/DDWT18/', False),
+        'Final' => na('/DDWT18/final/', False),
+        'Add Room' => na('/DDWT18/final/new/', True)
+    ]);
+    $navigation = get_navigation($template, 3);
+
+    /* Page content */
+    $page_subtitle = 'Add your room.';
+    $page_content = 'Fill in the details of your room.';
+    $submit_btn = "Add Room";
+    $form_action = '/DDWT18/final/add/';
+
+    /* Get error message from POST route */
+    if ( isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+
+    /* Choose Template */
+    include use_template('new');
+}
+
+/* Add serie POST */
+elseif (new_route('/DDWT18/final/add/', 'post')) {
+    /* Check if logged in */
+    //ToDo: uncomment if login functionality works
+//    if ( !check_login() ) {
+//        redirect('/DDWT18/week2/login/');
+//    }
+
+    /* Add serie to database */
+    $feedback = add_room($db, $_POST);
+
+    /* Redirect to serie GET route */
+    redirect(sprintf('/DDWT18/final/add/?error_msg=%s', json_encode($feedback)));
 }
 
 /* Myaccount GET */
