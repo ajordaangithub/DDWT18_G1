@@ -384,22 +384,22 @@ function get_username($pdo, $user_id) {
 }
 
 /**
- * Generates an array with serie information
+ * Generates an array with room information
  * @param object $pdo db object
- * @param int $serie_id id from the serie
+ * @param int $room_id id from the room
  * @return mixed
  */
-function get_roominfo($pdo, $serie_id){
+function get_roominfo($pdo, $room_id){
     $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
-    $stmt->execute([$serie_id]);
-    $serie_info = $stmt->fetch();
-    $serie_info_exp = Array();
+    $stmt->execute([$room_id]);
+    $room_info = $stmt->fetch();
+    $room_info_exp = Array();
 
     /* Create array with htmlspecialchars */
-    foreach ($serie_info as $key => $value){
-        $serie_info_exp[$key] = htmlspecialchars($value);
+    foreach ((array) $room_info as $key => $value){
+        $room_info_exp[$key] = htmlspecialchars($value);
     }
-    return $serie_info_exp;
+    return $room_info_exp;
 }
 
 function register_user($pdo, $form_data){
