@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
     <!-- Own CSS -->
-    <link rel="stylesheet" href="/DDWT18/week2/css/main.css">
+    <link rel="stylesheet" href="/DDWT18/final/css/main.css">
 
     <title><?= $page_title ?></title>
 </head>
@@ -32,16 +32,19 @@
 
             <h1><?= $page_title ?></h1>
             <h5><?= $page_subtitle ?></h5>
-            <p><?= $page_content ?></p>
             <table class="table">
                 <tbody>
                 <tr>
-                    <th scope="row">Creators</th>
-                    <td><?= $creators ?></td>
+                    <th scope="row">Type</th>
+                    <td><?= $room_type ?></td>
                 </tr>
                 <tr>
-                    <th scope="row">Number of seasons</th>
-                    <td><?= $nbr_seasons ?></td>
+                    <th scope="row">Price</th>
+                    <td><?= $room_price ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">Size</th>
+                    <td><?= $room_size ?> m2</td>
                 </tr>
                 <tr>
                     <th scope="row">Added by user</th>

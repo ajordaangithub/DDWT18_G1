@@ -23,7 +23,7 @@ $template = Array(
     ),
     3 => Array(
         'name' => 'Add Serie',
-        'url' => '/DDWT18/week2/add/'
+        'url' => '/DDWT18/final/add/'
     ),
     4 => Array(
         'name' => 'My Account',
@@ -117,9 +117,9 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
 
     /* Page content */
     $page_subtitle = sprintf("Information about %s", $room_info['address']);
-    $page_content = $room_info['type'];
-    $nbr_seasons = $room_info['price'];
-    $creators = $room_info['size'];
+    $room_type = $room_info['type'];
+    $room_price = $room_info['price'];
+    $room_size = $room_info['size'];
     $added_by = (get_username($db, $userid)['full_name']);
 
     if ( isset($_GET['error_msg']) ) {

@@ -2,6 +2,12 @@
     padding: 15px 0 0 0;
 }
 
+#overview-card {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
 .card-body h2{
     margin: 0;
 }
