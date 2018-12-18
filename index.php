@@ -267,21 +267,22 @@ elseif (new_route('/DDWT18/final/edit/', 'post')) {
 
 /* Myaccount GET */
 elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
+    if (!check_login()) {
+        redirect('/DDWT18/final/login/');
+    }
     /* page info */
-    $user = get_user_id();
-    /*$user_id = get_user_id();
-    $user = get_user_name($db, $user_id); */
-    $page_title = 'My account Placeholder';
+    $user = get_username($db, $_SESSION['user_id'])['full_name'];
+    $page_title = 'My account';
     $breadcrumbs = get_breadcrumbs([
         'DDWT18' => na('/DDWT18/', False),
         'Final' => na('/DDWT18/final/', False),
         'My Account' => na('/DDWT18/final/myaccount', True)
     ]);
-    $navigation = get_navigation($template, 3);
+    $navigation = get_navigation($template, 4);
 
     /* page content */
-    $page_subtitle = sprintf("My account page");
-    $page_content = 'View your account';
+    $page_subtitle = sprintf("View all your submitted rooms and opt-ins");
+    $page_content = '';
 
     /* Get error message from POST route */
     if ( isset($_GET['error_msg'])) {

@@ -46,7 +46,7 @@
                     Welcome, <?= $user ?>
                 </div>
                 <div class="card-body">
-                    <p>You're logged in to Series Overview.</p>
+                    <p>You're logged in.</p>
                     <a href="/DDWT18/final/logout/" class="btn btn-primary">Logout</a>
                 </div>
             </div>
@@ -55,11 +55,11 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
-                    Add series
+                    Add room
                 </div>
                 <div class="card-body">
-                    <p>Add your contribution to Series Overview.</p>
-                    <a href="/DDWT18/week2/add/" class="btn btn-primary">Add a series</a>
+                    <p>Add new residence to rent out</p>
+                    <a href="/DDWT18/week2/add/" class="btn btn-primary">Add room</a>
                 </div>
             </div>
         </div>
