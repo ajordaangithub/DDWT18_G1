@@ -65,6 +65,32 @@
                     </div>
                 </div>
             <?php }?>
+            <?php if ($display_optin) {?>
+            <div class="optin">
+                <h5>Initiate an opt-in</h5>
+                <form action="/DDWT18/final/optin/" method="POST">
+                    <div class="form-group row">
+                        <label for="optinMessage" class="col-sm-2 col-form-label">Message</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="optinMessage" name="Message" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="hidden" value="<?= $room_id ?>" name="room_id">
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-10">
+                                <button type="submit" class="btn btn-primary">Opt-in!</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <?php }?>
+                <?php if($display_optins) {?>
+                    <?php if(isset($left_content)){?>
+                        <h1>Current Opt-ins</h1>
+                        <?php echo $left_content;} ?>
+                <?php }?>
 
         </div>
 

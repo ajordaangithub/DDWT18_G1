@@ -55,10 +55,10 @@ if (new_route('/DDWT18/final/', 'get')) {
     $page_subtitle = 'The online platform to see all the available rooms here in Groningen';
     $page_content = 'On Available Rooms you can add rooms that you have available. You can see all the available rooms in Groningen. By listing your available rooms you help all the students who still need a room.';
 
-    /*if ( isset($_GET['error_msg']) ) {
+    if ( isset($_GET['error_msg']) ) {
         $error_msg = get_error($_GET['error_msg']);
     }
-    */
+
 
     /* Choose Template */
     include use_template('main');
@@ -66,6 +66,10 @@ if (new_route('/DDWT18/final/', 'get')) {
 
 /* Overview page */
 elseif (new_route('/DDWT18/final/overview/', 'get')) {
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
+    $userinfo = get_userinfo($db, get_user_id());
     /* Page info */
     $page_title = 'Overview';
     $breadcrumbs = get_breadcrumbs([
@@ -78,12 +82,16 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
     /* Page content */
     $page_subtitle = 'The overview of all series';
     $page_content = 'Here you find all series listed on Series Overview.';
-    $left_content = get_room_table(get_rooms($db), $db);
+    if ($userinfo['role'] == 1) {
+        $left_content = get_room_table(get_rooms_owner($db, get_user_id()), $db);
+    } else {
+        $left_content = get_room_table(get_rooms_tenant($db), $db);
+    }
 
-    /*if ( isset($_GET['error_msg']) ) {
+    if ( isset($_GET['error_msg']) ) {
         $error_msg = get_error($_GET['error_msg']);
     }
-    */
+
 
     /* Choose Template */
     include use_template('main');
@@ -92,21 +100,37 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
 /* Single Room */
 elseif (new_route('/DDWT18/final/room/', 'get')) {
         /* Get Number of Series */
-    /*$current_user = get_user_id();
-*/
+    $current_user = get_user_id();
     /* Get series from db */
     $room_id = $_GET['room_id'];
     $room_info = get_roominfo($db, $room_id);
     $userid = $room_info['owner'];
+    $userinfo = get_userinfo($db, $current_user);
 
-    /*if ($current_user == $serie_info['user']) {
+    if ($current_user == $userid) {
         $display_buttons = True;
     } else {
         $display_buttons = False;
-    }*/
+    }
+
+    $optins = check_optins($db, $current_user, $room_id);
+    if ($optins)
+        if ($userinfo['role'] == 1) {
+            $display_optin = False;
+            $display_optins = True;
+            $left_content = get_optin_table(get_optins_owner($db, $room_id), $db);
+        } else {
+            $display_optin = True;
+            $display_optins = True;
+            $left_content = get_optin_table(get_optins_tenant($db, $room_id, $current_user), $db);
+    } else {
+        $display_optin = False;
+        $display_optins = True;
+        $left_content = get_optin_table(get_optins_tenant($db, $room_id, $current_user), $db);
+    }
+
 
     /*For now, $display_buttons is true. Has to be altered when authentication is done.*/
-    $display_buttons = True;
 
     /* Page info */
     $page_title = $room_info['address'];
@@ -132,13 +156,20 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
     include use_template('room');
 }
 
+elseif (new_route('/DDWT18/final/optin/', 'post')) {
+    /* Check if logged in */
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
+    $feedback = add_optin($db, $_POST, $_SESSION['user_id']);
+    redirect(sprintf('/DDWT18/final/overview/?error_msg=%s', json_encode($feedback)));
+}
 /* Add Room GET */
 elseif (new_route('/DDWT18/final/add/', 'get')) {
     /* Check if logged in */
-    //ToDo: uncomment if login functionality works
-//    if ( !check_login() ) {
-//        redirect('/DDWT18/final/login/');
-//    }
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
 
     /* Page info */
     $page_title = 'Add Room';
@@ -168,12 +199,12 @@ elseif (new_route('/DDWT18/final/add/', 'get')) {
 elseif (new_route('/DDWT18/final/add/', 'post')) {
     /* Check if logged in */
     //ToDo: uncomment if login functionality works
-//    if ( !check_login() ) {
-//        redirect('/DDWT18/final/login/');
-//    }
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
 
     /* Add room to database */
-    $feedback = add_room($db, $_POST);
+    $feedback = add_room($db, $_POST, $_SESSION['user_id']);
 
     /* Redirect to room GET route */
     redirect(sprintf('/DDWT18/final/add/?error_msg=%s', json_encode($feedback)));
@@ -183,9 +214,9 @@ elseif (new_route('/DDWT18/final/add/', 'post')) {
 elseif (new_route('/DDWT18/final/edit/', 'get')) {
     /* Check if logged in */
     //ToDo: uncomment if login functionality works
-//    if ( !check_login() ) {
-//        redirect('/DDWT18/final/login/');
-//    }
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
 
     /* Get room info from db */
     $room_id = $_GET['room_id'];
@@ -219,9 +250,9 @@ elseif (new_route('/DDWT18/final/edit/', 'get')) {
 elseif (new_route('/DDWT18/final/edit/', 'post')) {
     /* Check if logged in */
     //ToDo: uncomment if login functionality works
-//    if ( !check_login() ) {
-//        redirect('/DDWT18/final/login/');
-//    }
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
 
     /* Get room info from db */
     $room_id = $_POST['room_id'];
@@ -251,6 +282,11 @@ elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
     /* page content */
     $page_subtitle = sprintf("My account page");
     $page_content = 'View your account';
+
+    /* Get error message from POST route */
+    if ( isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
 
     /* Choose Template */
     include use_template('account');

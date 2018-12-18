@@ -155,9 +155,29 @@ function count_users($pdo) {
  * @param object $pdo database object
  * @return array Associative array with all series
  */
-function get_rooms($pdo){
+function get_rooms_tenant($pdo){
     $stmt = $pdo->prepare('SELECT * FROM rooms');
     $stmt->execute();
+    $series = $stmt->fetchAll();
+    $series_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($series as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $series_exp;
+}
+
+/**
+ * Get array with all listed series from the database
+ * @param object $pdo database object
+ * @return array Associative array with all series
+ */
+function get_rooms_owner($pdo, $userid){
+    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ?');
+    $stmt->execute([$userid]);
     $series = $stmt->fetchAll();
     $series_exp = Array();
 
@@ -177,30 +197,6 @@ function get_rooms($pdo){
  * @return string
  */
 function get_room_table($series, $pdo){
-    /*$table_exp = '
-    <table class="table table-hover">
-    <thead
-    <tr>
-        <th scope="col">Room</th>
-        <th scope="col">Added by</th>
-        <th scope="col"></th>
-    </tr>
-    </thead>
-    <tbody>';
-    foreach($series as $key => $value){
-        $table_exp .= '
-        <tr>
-            <th scope="row">'.$value['address'].'</th>
-            <td>'.(get_username($pdo, $value['owner'])['full_name']).'</td>
-            <td><a href="/DDWT18/final/room/?room_id='.$value['id'].'&user_id='.$value['owner'].'" role="button" class="btn btn-primary">More info</a></td>
-        </tr>
-        ';
-    }
-    $table_exp .= '
-    </tbody>
-    </table>
-    ';
-    return $table_exp;*/
     $card_exp = '<div class="card-body"> </div>';
     foreach ($series as $key => $value) {
         $card_exp .= '<div class="card" id="overview-card" style="width: 350px;">
@@ -224,7 +220,7 @@ function get_room_table($series, $pdo){
  * @param array $room_info post array
  * @return array with feedback message
  */
-function add_room($pdo, $room_info){
+function add_room($pdo, $room_info, $userid){
     /* Check if fields are correctly set */
     if (empty($room_info['Address'])){
         return [
@@ -264,12 +260,13 @@ function add_room($pdo, $room_info){
     /* Add room */
     // ToDO: add owner to this list (dependant on login functionality)
     else {
-        $stmt = $pdo->prepare("INSERT INTO rooms (address, type, price, size, owner) VALUES (?, ?, ?, ?, 1)");
+        $stmt = $pdo->prepare("INSERT INTO rooms (address, type, price, size, owner) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([
             $room_info['Address'],
             $room_info['Type'],
             $room_info['Price'],
             $room_info['Size'],
+            $userid
         ]);
         $inserted = $stmt->rowCount();
         if ($inserted == 1) {
@@ -402,6 +399,29 @@ function get_roominfo($pdo, $room_id){
     return $room_info_exp;
 }
 
+/**
+ * Count the current number of users in the database
+ * @param PDO $pdo database object
+ * @return mixed
+ */
+function get_userinfo($pdo, $user_id){
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
+    $stmt->execute([$user_id]);
+    $user_info = $stmt->fetch();
+    $user_info_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ((array) $user_info as $key => $value){
+        $user_info_exp[$key] = htmlspecialchars($value);
+    }
+    return $user_info_exp;
+}
+
+/**
+ * Count the current number of users in the database
+ * @param PDO $pdo database object
+ * @return mixed
+ */
 function register_user($pdo, $form_data){
     /* Check if all fields are set */
     if (
@@ -448,11 +468,16 @@ birth_date, role, biography, profession, language, email, phonenumber) VALUES (?
             'message' => sprintf('There was an error: %s', $e->getMessage())
         ];
     }
+    /* Login user and redirect */
+    session_start();
     $_SESSION['user_id'] = $user_id;
-    return [
+    $feedback = [
         'type' => 'success',
-        'message' => "you're registered."
+        'message' => sprintf('%s, your account was successfully
+created!', (get_username($pdo, $_SESSION['user_id'])['full_name']))
     ];
+    redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s',
+        json_encode($feedback)));
 }
 
 function get_error($feedback){
@@ -469,6 +494,11 @@ function redirect($location){
     die();
 }
 
+/**
+ * Count the current number of users in the database
+ * @param PDO $pdo database object
+ * @return mixed
+ */
 function login_user($pdo, $form_data) {
     if (
         empty($form_data['username']) or
@@ -495,7 +525,8 @@ function login_user($pdo, $form_data) {
         ];
     }
     else {
-        $_SESSION['userid'] = $user['id'];
+        session_start();
+        $_SESSION['user_id'] = $user['id'];
         return [
             'type' => 'success',
             'message' => 'You are logged in.'
@@ -504,7 +535,7 @@ function login_user($pdo, $form_data) {
 }
 
 function check_login(){
-    if (isset($_SESSION['userid'])){
+    if (isset($_SESSION['user_id'])){
         return True;
     } else {
         return False;
@@ -520,12 +551,126 @@ function get_user_id(){
 }
 
 function logout_user($pdo) {
-    $user = $_SESSION['user_id'];
-    unset($_SESSION['user_id']);
-    if(empty($_SESSION['user_id'])) {
+    session_start();
+    session_destroy();
+    $feedback = [
+        'type' => 'success',
+        'message' => sprintf('%s, you have been succesfully logged out!', (get_username($pdo, $_SESSION['user_id'])['full_name']))
+    ];
+    return $feedback;
+}
+
+/**
+ * Count the current number of users in the database
+ * @param PDO $pdo database object
+ * @return mixed
+ */
+function check_optins($pdo, $userid, $roomid) {
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
+    $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ? AND userid = ?');
+    $stmt->execute([$roomid, $userid]);
+    $affected = $stmt->rowCount();
+    if ($affected == 0) {
+        return True;
+    } else {
+        return False;
+    }
+}
+
+/**
+ * Count the current number of users in the database
+ * @param PDO $pdo database object
+ * @return mixed
+ */
+function add_optin($pdo, $form_data, $userid) {
+    if (empty($form_data['Message'])) {
         return [
-            'type' => 'success',
-            'message' => "You're logged out"
+            'type' => 'warning',
+            'message' => 'No message was given. The opt-in was not added'
         ];
     }
+
+    else {
+        $stmt = $pdo->prepare('INSERT INTO optins (roomid, userid, date, message) VALUES (?,?,?,?)');
+        $stmt->execute([$form_data['room_id'], $userid, date('D M Y'), $form_data['Message']]);
+        $inserted = $stmt->rowCount();
+        if ($inserted == 1) {
+            return [
+                'type' => 'success',
+                'message' => sprintf("Optin was succesfully added")];
+        }
+    }
+    return [
+        'type' => 'danger',
+        'message' => 'There was an error. Optin not added. Try it again.'
+    ];
+}
+
+/**
+ * Get array with all listed series from the database
+ * @param object $pdo database object
+ * @return array Associative array with all series
+ */
+function get_optins_owner($pdo, $roomid){
+    $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ?');
+    $stmt->execute([$roomid]);
+    $optins = $stmt->fetchAll();
+    $optins_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($optins as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $optins_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $optins_exp;
+}
+
+/**
+ * Get array with all listed series from the database
+ * @param object $pdo database object
+ * @return array Associative array with all series
+ */
+function get_optins_tenant($pdo, $roomid, $userid){
+    $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ? and userid = ?');
+    $stmt->execute([$roomid, $userid]);
+    $optins = $stmt->fetchAll();
+    $optins_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($optins as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $optins_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $optins_exp;
+}
+
+/**
+ * Creats a Bootstrap table with a list of series
+ * @param PDO $pdo database object
+ * @param array $series with series from the db
+ * @return string
+ */
+function get_optin_table($optins, $pdo){
+    $card_exp = '<div class="card-body"> </div>';
+    foreach ($optins as $key => $value) {
+        $card_exp .= '<div class="card" id="overview-card" style="width: 750px;">
+  <div class="card-body">
+    <p class="card-text"><b>Name:</b> '.get_username($pdo,$value['userid'])['full_name'].'</p>
+    <p class="card-text"><b>Birth Date:</b> '.get_userinfo($pdo,$value['userid'])['birth_date'].'</p>
+    <p class="card-text"><b>Biography:</b> '.get_userinfo($pdo,$value['userid'])['biography'].'</p>
+    <p class="card-text"><b>Profession:</b> '.get_userinfo($pdo,$value['userid'])['profession'].'</p>
+    <p class="card-text"><b>Language:</b> '.get_userinfo($pdo,$value['userid'])['language'].'</p>
+    <p class="card-text"><b>Email:</b> '.get_userinfo($pdo,$value['userid'])['email'].'</p>
+    <p class="card-text"><b>Phone-number:</b> '.get_userinfo($pdo,$value['userid'])['phonenumber'].'</p>
+    <p class="card-text"><b>Date of opt-in:</b> '.$value['date'].'</p>
+    <p class="card-text"><b>Message:</b> '.$value['message'].'</p>
+  </div>
+</div>
+';
+    }
+    return $card_exp;
 }
