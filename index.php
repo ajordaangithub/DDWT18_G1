@@ -258,7 +258,7 @@ elseif (new_route('/DDWT18/final/edit/', 'post')) {
     $room_id = $_POST['room_id'];
 
     /* Update room to database */
-    $feedback = update_room($db, $_POST);
+    $feedback = update_room($db, $_POST, $_SESSION['user_id']);
 
     /* Redirect to room GET route */
     redirect(sprintf('/DDWT18/final/room/?room_id='.$room_id.'?error_msg=%s', json_encode($feedback)));

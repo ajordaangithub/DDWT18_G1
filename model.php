@@ -218,9 +218,10 @@ function get_room_table($series, $pdo){
  * Adds a room to the database.
  * @param object $pdo db object
  * @param array $room_info post array
+ * @param int $user_id user id
  * @return array with feedback message
  */
-function add_room($pdo, $room_info, $userid){
+function add_room($pdo, $room_info, $user_id){
     /* Check if fields are correctly set */
     if (empty($room_info['Address'])){
         return [
@@ -258,7 +259,6 @@ function add_room($pdo, $room_info, $userid){
     }
 
     /* Add room */
-    // ToDO: add owner to this list (dependant on login functionality)
     else {
         $stmt = $pdo->prepare("INSERT INTO rooms (address, type, price, size, owner) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([
@@ -266,7 +266,7 @@ function add_room($pdo, $room_info, $userid){
             $room_info['Type'],
             $room_info['Price'],
             $room_info['Size'],
-            $userid
+            $user_id
         ]);
         $inserted = $stmt->rowCount();
         if ($inserted == 1) {
@@ -281,7 +281,13 @@ function add_room($pdo, $room_info, $userid){
     ];
 }
 
-function update_room($pdo, $room_info) {
+/**
+ * Updates a room already in the database
+ * @param object $pdo db object
+ * @param array $room_info POST array
+ * @return array Feedback message
+ */
+function update_room($pdo, $room_info, $user_id) {
     /* Check if fields are correctly set */
     if (empty($room_info['Address'])){
         return [
@@ -323,17 +329,16 @@ function update_room($pdo, $room_info) {
         ];
     }
 
-    //Todo: uncomment this when login functionality is added.
-//    /* Check who added the room */
-//    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
-//    $stmt->execute([$room_info['room_id']]);
-//    $room = $stmt->fetch();
-//    if ( $room['owner'] != get_user_id()){
-//        return [
-//            'type' => 'danger',
-//            'message' => sprintf("You are not allowed to edit this, since this series was added by %s", $room['name'])
-//        ];
-//    }
+    /* Check who added the room */
+    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
+    $stmt->execute([$room_info['room_id']]);
+    $room = $stmt->fetch();
+    if ( $room['owner'] != $user_id){
+        return [
+            'type' => 'danger',
+            'message' => sprintf("You are not allowed to edit this, since this series was added by %s", $room['name'])
+        ];
+    }
 
     /* Update room */
     else {
