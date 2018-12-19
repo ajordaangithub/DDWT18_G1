@@ -80,11 +80,12 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
     $navigation = get_navigation($template, 2);
 
     /* Page content */
-    $page_subtitle = 'The overview of all series';
-    $page_content = 'Here you find all series listed on Series Overview.';
+    $page_subtitle = 'The overview of all rooms';
     if ($userinfo['role'] == 1) {
+        $page_content = 'Here you find all rooms you have listed on Rooms Overview.';
         $left_content = get_room_table(get_rooms_owner($db, get_user_id()), $db);
-    } else {
+    } elseif ($userinfo['role'] == 2) {
+        $page_content = 'Here you find all rooms listed on Rooms Overview.';
         $left_content = get_room_table(get_rooms_tenant($db), $db);
     }
 
@@ -99,9 +100,9 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
 
 /* Single Room */
 elseif (new_route('/DDWT18/final/room/', 'get')) {
-        /* Get Number of Series */
+        /* Get Number of Rooms */
     $current_user = get_user_id();
-    /* Get series from db */
+    /* Get Rooms from db */
     $room_id = $_GET['room_id'];
     $room_info = get_roominfo($db, $room_id);
     $userid = $room_info['owner'];
@@ -200,7 +201,6 @@ elseif (new_route('/DDWT18/final/add/', 'get')) {
 /* Add room POST */
 elseif (new_route('/DDWT18/final/add/', 'post')) {
     /* Check if logged in */
-    //ToDo: uncomment if login functionality works
     if ( !check_login() ) {
         redirect('/DDWT18/final/login/');
     }
@@ -215,7 +215,6 @@ elseif (new_route('/DDWT18/final/add/', 'post')) {
 /* Edit room GET */
 elseif (new_route('/DDWT18/final/edit/', 'get')) {
     /* Check if logged in */
-    //ToDo: uncomment if login functionality works
     if ( !check_login() ) {
         redirect('/DDWT18/final/login/');
     }
@@ -251,7 +250,6 @@ elseif (new_route('/DDWT18/final/edit/', 'get')) {
 /* Edit room POST */
 elseif (new_route('/DDWT18/final/edit/', 'post')) {
     /* Check if logged in */
-    //ToDo: uncomment if login functionality works
     if ( !check_login() ) {
         redirect('/DDWT18/final/login/');
     }
@@ -283,13 +281,14 @@ elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
     $navigation = get_navigation($template, 4);
 
     /* page content */
-    $page_subtitle = sprintf("View all your submitted rooms and opt-ins");
     $page_content = '';
     $role = get_userinfo($db, $_SESSION['user_id'])['role'];
     if ($role == 2) {
+        $page_subtitle = sprintf("View all your submitted opt-ins");
         $display_optins = True;
         $left_content = get_optin_table_tenant(get_alloptins_tenant($db, $_SESSION['user_id']), $db);
-    } else {
+    } elseif ($role == 1) {
+        $page_subtitle = sprintf("View all your submitted rooms");
         $display_optins = False;
     }
 
