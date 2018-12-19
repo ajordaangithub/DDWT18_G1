@@ -330,6 +330,7 @@ function update_room($pdo, $room_info, $user_id) {
     }
 
     /* Check who added the room */
+    //ToDO: can this be done using a hidden variable in the form instead of using sql?
     $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
     $stmt->execute([$room_info['room_id']]);
     $room = $stmt->fetch();
