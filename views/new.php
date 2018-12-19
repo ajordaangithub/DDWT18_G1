@@ -72,8 +72,7 @@
                 </div> -->
                 
                 <?php if(isset($room_id)){ ?> <input type="hidden" name="room_id" value=" <?php echo $room_id ?>"><?php } ?>
-
-
+                
                 <div class="form-group row">
                     <div class="col-sm-10">
                         <button type="submit" class="btn btn-primary"><?= $submit_btn ?></button>

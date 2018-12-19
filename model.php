@@ -331,14 +331,10 @@ function update_room($pdo, $room_info, $user_id) {
     }
 
     /* Check who added the room */
-    //ToDO: can this be done using a hidden variable in the form instead of using sql?
-    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
-    $stmt->execute([$room_info['room_id']]);
-    $room = $stmt->fetch();
-    if ( $room['owner'] != $user_id){
+    elseif ( $room_info['owner'] != $user_id){
         return [
             'type' => 'danger',
-            'message' => sprintf("You are not allowed to edit this, since this series was added by %s", $room['name'])
+            'message' => sprintf("You are not allowed to edit this, since this room was not added by you.")
         ];
     }
 
@@ -383,7 +379,7 @@ function remove_room($pdo, $room_id){
         ];
     }
 
-    /* Delete room and correpsonding opt-ins*/
+    /* Delete room and corresponding opt-ins*/
     $stmt = $pdo->prepare("DELETE FROM rooms WHERE id = ?; DELETE FROM optins WHERE roomid = ?");
     $stmt->execute([$room_id, $room_id]);
     $deleted = $stmt->rowCount();
