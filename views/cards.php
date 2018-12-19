@@ -1,7 +1,7 @@
 <!-- Rooms count -->
 <div class="card">
     <div class="card-header">
-        Roomf
+        Rooms
     </div>
     <div class="card-body">
         <p class="count">Available already has</p>
