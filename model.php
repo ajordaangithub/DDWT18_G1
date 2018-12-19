@@ -222,6 +222,7 @@ function get_room_table($series, $pdo){
  * @return array with feedback message
  */
 function add_room($pdo, $room_info, $user_id){
+    //ToDo: check if user has role owner
     /* Check if fields are correctly set */
     if (empty($room_info['Address'])){
         return [
@@ -365,28 +366,26 @@ function update_room($pdo, $room_info, $user_id) {
 }
 
 /**
- * Removes a room with a specific room-ID
+ * Removes a room with a specific room-ID and its corresponding opt-ins
  * @param object $pdo db object
  * @param int $room_id id of the to be deleted series
  * @return array
  */
-//ToDo: make sure related opt-ins are deleted as well
 function remove_room($pdo, $room_id){
     /* Get room info */
     $room_info = get_roominfo($pdo, $room_id);
 
-    //ToDo: check if this works
-//    /* Check who added the room */
-//    if ( $room_info['owner'] == get_user_id() ) {
-//        return [
-//            'type' => 'danger',
-//            'message' => sprintf("You are not allowed to delete this, since this room was not added by you.")
-//        ];
-//    }
+    /* Check who added the room */
+    if ( $room_info['owner'] != get_user_id() ) {
+        return [
+            'type' => 'danger',
+            'message' => sprintf("You are not allowed to delete this, since this room was not added by you.")
+        ];
+    }
 
-    /* Delete room */
-    $stmt = $pdo->prepare("DELETE FROM rooms WHERE id = ?");
-    $stmt->execute([$room_id]);
+    /* Delete room and correpsonding opt-ins*/
+    $stmt = $pdo->prepare("DELETE FROM rooms WHERE id = ?; DELETE FROM optins WHERE roomid = ?");
+    $stmt->execute([$room_id, $room_id]);
     $deleted = $stmt->rowCount();
     if ($deleted ==  1) {
         return [
@@ -396,7 +395,7 @@ function remove_room($pdo, $room_id){
     }
     else {
         return [
-            'type' => 'warning',
+            'type' => 'danger',
             'message' => 'An error occurred. The room was not removed.'
         ];
     }
