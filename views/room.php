@@ -71,20 +71,16 @@
                 <form action="/DDWT18/final/optin/" method="POST">
                     <div class="form-group row">
                         <label for="optinMessage" class="col-sm-2 col-form-label">Message</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="optinMessage" name="Message" required>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" id="optinMessage" rows="3" name="Message" required></textarea>
                         </div>
+                    </div>
                         <div class="col-sm-2">
                             <input type="hidden" value="<?= $room_id ?>" name="room_id">
                         </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-10">
-                                <button type="submit" class="btn btn-primary">Opt-in!</button>
-                            </div>
-                        </div>
-                    </div>
+                        <button type="submit" class="btn btn-primary">Opt-in!</button>
                 </form>
+            </div>
                 <?php }?>
                 <?php if($display_optins) {?>
                     <?php if(isset($left_content)){?>

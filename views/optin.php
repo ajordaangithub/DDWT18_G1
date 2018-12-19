@@ -25,52 +25,29 @@
 
     <div class="row">
 
-        <div class="col-md-12">
+        <!-- Left column -->
+        <div class="col-md-8">
             <!-- Error message -->
             <?php if (isset($error_msg)){echo $error_msg;} ?>
 
             <h1><?= $page_title ?></h1>
             <h5><?= $page_subtitle ?></h5>
             <p><?= $page_content ?></p>
-        </div>
-
-    </div>
-
-    <div class="pd-15">&nbsp;</div>
-
-    <div class="row">
-
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    Welcome, <?= $user ?>
-                </div>
-                <div class="card-body">
-                    <p>You're logged in.</p>
-                    <a href="/DDWT18/final/logout/" class="btn btn-primary">Logout</a>
-                </div>
+            <div class="optin">
+                <h5>Initiate an opt-in</h5>
+                <form action="/DDWT18/final/editoptin/" method="POST">
+                    <div class="form-group row">
+                        <label for="optinMessage" class="col-sm-2 col-form-label">Message</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" id="optinMessage" rows="3" name="Message" required><?php if (isset($optin_info)){echo $optin_info['message'];} ?></textarea>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="hidden" value="<?= $room_id ?>" name="user_id">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Edit!</button>
+                </form>
             </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    Add room
-                </div>
-                <div class="card-body">
-                    <p>Add new residence to rent out</p>
-                    <a href="/DDWT18/final/add/" class="btn btn-primary">Add room</a>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="optin">
-        <?php if($display_optins) {?>
-            <?php if(isset($left_content)){?>
-                <h1 id="header">Current Opt-ins</h1>
-                <?php echo $left_content;} ?>
-        <?php }?>
     </div>
 </div>
 
