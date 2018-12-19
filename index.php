@@ -118,15 +118,15 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
         if ($userinfo['role'] == 1) {
             $display_optin = False;
             $display_optins = True;
-            $left_content = get_optin_table(get_optins_owner($db, $room_id), $db);
+            $left_content = get_optin_table_owner(get_optins_owner($db, $room_id), $db);
         } else {
             $display_optin = True;
             $display_optins = True;
-            $left_content = get_optin_table(get_optins_tenant($db, $room_id, $current_user), $db);
+            $left_content = get_optin_table_tenant(get_optins_tenant($db, $room_id, $current_user), $db);
     } else {
         $display_optin = False;
         $display_optins = True;
-        $left_content = get_optin_table(get_optins_tenant($db, $room_id, $current_user), $db);
+        $left_content = get_optin_table_tenant(get_optins_tenant($db, $room_id, $current_user), $db);
     }
 
 
@@ -164,6 +164,7 @@ elseif (new_route('/DDWT18/final/optin/', 'post')) {
     $feedback = add_optin($db, $_POST, $_SESSION['user_id']);
     redirect(sprintf('/DDWT18/final/overview/?error_msg=%s', json_encode($feedback)));
 }
+
 /* Add Room GET */
 elseif (new_route('/DDWT18/final/add/', 'get')) {
     /* Check if logged in */
@@ -194,6 +195,7 @@ elseif (new_route('/DDWT18/final/add/', 'get')) {
     /* Choose Template */
     include use_template('new');
 }
+
 
 /* Add room POST */
 elseif (new_route('/DDWT18/final/add/', 'post')) {
@@ -283,6 +285,13 @@ elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
     /* page content */
     $page_subtitle = sprintf("View all your submitted rooms and opt-ins");
     $page_content = '';
+    $role = get_userinfo($db, $_SESSION['user_id'])['role'];
+    if ($role == 2) {
+        $display_optins = True;
+        $left_content = get_optin_table_tenant(get_alloptins_tenant($db, $_SESSION['user_id']), $db);
+    } else {
+        $display_optins = False;
+    }
 
     /* Get error message from POST route */
     if ( isset($_GET['error_msg'])) {
@@ -365,4 +374,21 @@ elseif (new_route('/DDWT18/final/logout/', 'get')) {
     $error_msg = logout_user($db);
     redirect(sprintf('/DDWT18/final/?error_msg=%s',
         json_encode($error_msg)));
+}
+
+/* Remove optin */
+elseif (new_route('/DDWT18/final/removeoptin/', 'post')) {
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
+    /* Remove optin in database */
+    $feedback = remove_optin($db, $_POST['room_id'], $_POST['user_id']);
+    $error_msg = get_error($feedback);
+
+    redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s',
+        json_encode($feedback)));
+
+
+    /* Choose Template */
+    include use_template('main');
 }

@@ -633,8 +633,28 @@ function get_optins_owner($pdo, $roomid){
  * @param object $pdo database object
  * @return array Associative array with all series
  */
+function get_alloptins_tenant($pdo, $userid){
+    $stmt = $pdo->prepare('SELECT * FROM optins WHERE userid = ?');
+    $stmt->execute([$userid]);
+    $optins = $stmt->fetchAll();
+    $optins_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($optins as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $optins_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $optins_exp;
+}
+
+/**
+ * Get array with all listed series from the database
+ * @param object $pdo database object
+ * @return array Associative array with all series
+ */
 function get_optins_tenant($pdo, $roomid, $userid){
-    $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ? and userid = ?');
+    $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ? AND userid = ?');
     $stmt->execute([$roomid, $userid]);
     $optins = $stmt->fetchAll();
     $optins_exp = Array();
@@ -654,7 +674,7 @@ function get_optins_tenant($pdo, $roomid, $userid){
  * @param array $series with series from the db
  * @return string
  */
-function get_optin_table($optins, $pdo){
+function get_optin_table_owner($optins, $pdo){
     $card_exp = '<div class="card-body"> </div>';
     foreach ($optins as $key => $value) {
         $card_exp .= '<div class="card" id="overview-card" style="width: 750px;">
@@ -673,4 +693,75 @@ function get_optin_table($optins, $pdo){
 ';
     }
     return $card_exp;
+}
+
+/**
+ * Creats a Bootstrap table with a list of series
+ * @param PDO $pdo database object
+ * @param array $series with series from the db
+ * @return string
+ */
+function get_optin_table_tenant($optins, $pdo){
+    $card_exp = '<div class="card-body"> </div>';
+    foreach ($optins as $key => $value) {
+        $card_exp .= '<div class="card" id="overview-card" style="width: 750px;">
+  <div class="card-body">
+    <p class="card-text"><b>Room:</b> '.get_roominfo($pdo, $value['roomid'])['address'].'</p>
+    <p class="card-text"><b>Message:</b> '.$value['message'].'</p>
+    <div class="row">
+     <div class="col-sm-2">
+      <form action="/DDWT18/final/removeoptin/" method="POST">
+       <input type="hidden" value="'.$value['roomid'].'" name="room_id">
+       <input type="hidden" value="'.$value['userid'].'" name="user_id">
+       <button type="submit" class="btn btn-danger">Remove</button>
+      </form>
+     </div>
+    </div>
+  </div>
+</div>
+';
+    }
+    return $card_exp;
+}
+
+/**
+ * Creats a Bootstrap table with a list of series
+ * @param PDO $pdo database object
+ * @param array $series with series from the db
+ * @return array
+ */
+function remove_optin($pdo, $roomid, $userid) {
+    $stmt = $pdo->prepare('DELETE FROM optins WHERE roomid = ? AND userid = ?');
+    $stmt->execute([$roomid, $userid]);
+    $deleted = $stmt->rowCount();
+    if ($deleted == 1) {
+        return [
+            'type' => 'success',
+            'message' => 'Opt-in was successfully deleted.'
+        ];
+    } else {
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred. The optin was not removed.'
+        ];
+    }
+}
+
+/**
+ * Creats a Bootstrap table with a list of series
+ * @param PDO $pdo database object
+ * @param array $series with series from the db
+ * @return array
+ */
+function get_optin_info($pdo, $roomid, $userid) {
+    $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ? AND userid = ?');
+    $stmt->execute([$roomid, $userid]);
+    $optin_info = $stmt->fetch();
+    $optin_info_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ((array) $optin_info as $key => $value){
+        $optin_info_exp[$key] = htmlspecialchars($value);
+    }
+    return $optin_info_exp;
 }
