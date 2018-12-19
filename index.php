@@ -265,6 +265,23 @@ elseif (new_route('/DDWT18/final/edit/', 'post')) {
     /* TODO: show error msg after updating */
 }
 
+/* Delete room POST */
+elseif (new_route('/DDWT18/final/remove/', 'post')) {
+    /* Check if logged in */
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
+
+    /* Get serie id from POST */
+    $room_id = $_POST['room_id'];
+
+    /* Remove serie from database */
+    $feedback = remove_room($db, $room_id);
+
+    /* Redirect to serie GET route */
+    redirect(sprintf('/DDWT18/final/overview/?error_msg=%s', json_encode($feedback)));
+}
+
 /* Myaccount GET */
 elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
     if (!check_login()) {

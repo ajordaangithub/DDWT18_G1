@@ -365,6 +365,44 @@ function update_room($pdo, $room_info, $user_id) {
 }
 
 /**
+ * Removes a room with a specific room-ID
+ * @param object $pdo db object
+ * @param int $room_id id of the to be deleted series
+ * @return array
+ */
+//ToDo: make sure related opt-ins are deleted as well
+function remove_room($pdo, $room_id){
+    /* Get room info */
+    $room_info = get_roominfo($pdo, $room_id);
+
+    //ToDo: check if this works
+//    /* Check who added the room */
+//    if ( $room_info['owner'] == get_user_id() ) {
+//        return [
+//            'type' => 'danger',
+//            'message' => sprintf("You are not allowed to delete this, since this room was not added by you.")
+//        ];
+//    }
+
+    /* Delete room */
+    $stmt = $pdo->prepare("DELETE FROM rooms WHERE id = ?");
+    $stmt->execute([$room_id]);
+    $deleted = $stmt->rowCount();
+    if ($deleted ==  1) {
+        return [
+            'type' => 'success',
+            'message' => sprintf("Room '%s' was removed!", $room_info['address'])
+        ];
+    }
+    else {
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred. The room was not removed.'
+        ];
+    }
+}
+
+/**
  * Pritty Print Array
  * @param $input
  */
