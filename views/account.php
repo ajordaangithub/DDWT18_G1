@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
     <!-- Own CSS -->
-    <link rel="stylesheet" href="/DDWT18/week2/css/main.css">
+    <link rel="stylesheet" href="/DDWT18/final/css/main.css">
 
     <title><?= $page_title ?></title>
 </head>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="card-body">
                     <p>Add new residence to rent out</p>
-                    <a href="/DDWT18/week2/add/" class="btn btn-primary">Add room</a>
+                    <a href="/DDWT18/final/add/" class="btn btn-primary">Add room</a>
                 </div>
             </div>
         </div>
