@@ -408,3 +408,21 @@ elseif (new_route('/DDWT18/final/removeoptin/', 'post')) {
     /* Choose Template */
     include use_template('main');
 }
+
+/* Remove account */
+elseif (new_route('/DDWT18/final/removeaccount/', 'get')) {
+    if ( !check_login() ) {
+        redirect('/DDWT18/final/login/');
+    }
+    /* Remove optin in database */
+    $user_id = get_user_id();
+    $feedback = remove_account($db, $user_id);
+    $error_msg = get_error($feedback);
+
+    redirect(sprintf('/DDWT18/final/?error_msg=%s',
+        json_encode($feedback)));
+
+
+    /* Choose Template */
+    include use_template('main');
+}

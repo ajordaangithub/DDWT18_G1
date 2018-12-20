@@ -36,6 +36,7 @@
 
     </div>
 
+
     <div class="pd-15">&nbsp;</div>
 
     <div class="row">
@@ -48,6 +49,9 @@
                 <div class="card-body">
                     <p>You're logged in.</p>
                     <a href="/DDWT18/final/logout/" class="btn btn-primary">Logout</a>
+                    <br>
+                    <br>
+                    <a href="/DDWT18/final/removeaccount/" class="btn btn-primary" onclick="return confirm('Are you sure you want to remove your account?');">Remove account</a>
                 </div>
             </div>
         </div>

@@ -804,3 +804,23 @@ function get_optin_info($pdo, $roomid, $userid) {
     }
     return $optin_info_exp;
 }
+
+function remove_account($pdo, $userid) {
+    session_start();
+    session_destroy();
+    $stmt = $pdo->prepare('DELETE FROM users WHERE id = ?');
+    $stmt->execute([$userid]);
+    $deleted = $stmt->rowCount();
+    if ($deleted == 1) {
+        return [
+            'type' => 'success',
+            'message' => 'Account was successfully removed.'
+        ];
+    } else {
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred. Your account was not removed.'
+        ];
+    }
+}
+
