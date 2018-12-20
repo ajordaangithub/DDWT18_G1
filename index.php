@@ -67,7 +67,12 @@ if (new_route('/DDWT18/final/', 'get')) {
 /* Overview page */
 elseif (new_route('/DDWT18/final/overview/', 'get')) {
     if ( !check_login() ) {
-        redirect('/DDWT18/final/login/');
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To access overview you need to login.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
     }
     $userinfo = get_userinfo($db, get_user_id());
     /* Page info */
@@ -101,6 +106,14 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
 /* Single Room */
 elseif (new_route('/DDWT18/final/room/', 'get')) {
         /* Get Number of Rooms */
+    if ( !check_login() ) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To access a roompage you need to login.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
     $current_user = get_user_id();
     /* Get Rooms from db */
     $room_id = $_GET['room_id'];
@@ -160,7 +173,20 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
 elseif (new_route('/DDWT18/final/optin/', 'post')) {
     /* Check if logged in */
     if ( !check_login() ) {
-        redirect('/DDWT18/final/login/');
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To optin you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    if ($userinfo['role'] == '1') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot opt in.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
     }
     $feedback = add_optin($db, $_POST, $_SESSION['user_id']);
     redirect(sprintf('/DDWT18/final/overview/?error_msg=%s', json_encode($feedback)));
@@ -170,9 +196,22 @@ elseif (new_route('/DDWT18/final/optin/', 'post')) {
 elseif (new_route('/DDWT18/final/add/', 'get')) {
     /* Check if logged in */
     if ( !check_login() ) {
-        redirect('/DDWT18/final/login/');
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To add rooms you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
     }
-
+    $userinfo = get_userinfo($db, get_user_id());
+    if ($userinfo['role'] == '2') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot add rooms.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
+    }
     /* Page info */
     $page_title = 'Add Room';
     $breadcrumbs = get_breadcrumbs([
@@ -202,7 +241,21 @@ elseif (new_route('/DDWT18/final/add/', 'get')) {
 elseif (new_route('/DDWT18/final/add/', 'post')) {
     /* Check if logged in */
     if ( !check_login() ) {
-        redirect('/DDWT18/final/login/');
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To add rooms you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    $userinfo = get_userinfo($db, get_user_id());
+    if ($userinfo['role'] == '2') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot add rooms.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
     }
 
     /* Add room to database */
@@ -216,9 +269,21 @@ elseif (new_route('/DDWT18/final/add/', 'post')) {
 elseif (new_route('/DDWT18/final/edit/', 'get')) {
     /* Check if logged in */
     if ( !check_login() ) {
-        redirect('/DDWT18/final/login/');
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To edit rooms you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
     }
-
+    if ($userinfo['role'] == '2') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot edit rooms.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
+    }
     /* Get room info from db */
     $room_id = $_GET['room_id'];
     $room_info = get_roominfo($db, $room_id);
@@ -251,7 +316,20 @@ elseif (new_route('/DDWT18/final/edit/', 'get')) {
 elseif (new_route('/DDWT18/final/edit/', 'post')) {
     /* Check if logged in */
     if ( !check_login() ) {
-        redirect('/DDWT18/final/login/');
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To edit rooms you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    if ($userinfo['role'] == '2') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot edit rooms.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
     }
 
     /* Get room info from db */
@@ -269,7 +347,20 @@ elseif (new_route('/DDWT18/final/edit/', 'post')) {
 elseif (new_route('/DDWT18/final/remove/', 'post')) {
     /* Check if logged in */
     if ( !check_login() ) {
-        redirect('/DDWT18/final/login/');
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To remove rooms you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    if ($userinfo['role'] == '2') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot remove rooms.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
     }
 
     /* Get serie id from POST */
@@ -284,8 +375,13 @@ elseif (new_route('/DDWT18/final/remove/', 'post')) {
 
 /* Myaccount GET */
 elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
-    if (!check_login()) {
-        redirect('/DDWT18/final/login/');
+    if ( !check_login() ) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'Seriously, you think you can access the my account page without being logged in...'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
     }
     /* page info */
     $user = get_username($db, $_SESSION['user_id'])['full_name'];
@@ -322,6 +418,14 @@ elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
 
 elseif (new_route('/DDWT18/final/register/', 'get')) {
     /* Page info */
+    if ( check_login() ) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You already have an account.'
+        ];
+        redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s',
+            json_encode($error_msg)));
+    }
     $page_title = 'Register';
     $breadcrumbs = get_breadcrumbs([
         'DDWT18' => na('/DDWT18/', False),
@@ -342,6 +446,15 @@ elseif (new_route('/DDWT18/final/register/', 'get')) {
 }
 
 elseif (new_route('/DDWT18/final/register/', 'post')) {
+    if ( check_login() ) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You already have an account.'
+        ];
+        redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+
     $error_msg = register_user($db, $_POST);
     redirect(sprintf('/DDWT18/final/register/?error_msg=%s',
         json_encode($error_msg)));
@@ -350,7 +463,12 @@ elseif (new_route('/DDWT18/final/register/', 'post')) {
 
 elseif (new_route('/DDWT18/final/login/', 'get')) {
     if ( check_login() ) {
-        redirect('/DDWT18/final/myaccount/');
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You are already logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s',
+            json_encode($error_msg)));
     }
     /* Page info */
     $page_title = 'Login';
@@ -359,7 +477,7 @@ elseif (new_route('/DDWT18/final/login/', 'get')) {
         'Final' => na('/DDWT18/final/', False),
         'Login' => na('/DDWT18/final/login', True)
     ]);
-    $navigation = get_navigation($template, 3);
+    $navigation = get_navigation($template, 6);
 
     /* Page content */
     $page_subtitle = 'Please, login here';
@@ -373,6 +491,15 @@ elseif (new_route('/DDWT18/final/login/', 'get')) {
 }
 
 elseif (new_route('/DDWT18/final/login/', 'post')) {
+    if ( check_login() ) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You are already logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+
     /* Register user */
     $error_msg = login_user($db, $_POST);
     /* Redirect to homepage */
@@ -387,6 +514,15 @@ elseif (new_route('/DDWT18/final/login/', 'post')) {
 }
 
 elseif (new_route('/DDWT18/final/logout/', 'get')) {
+    if ( !check_login() ) {
+        $error_msg = [
+            'type' => 'danger',
+            'message' => 'You cannot logout without being logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+
     $error_msg = logout_user($db);
     redirect(sprintf('/DDWT18/final/?error_msg=%s',
         json_encode($error_msg)));
@@ -395,7 +531,20 @@ elseif (new_route('/DDWT18/final/logout/', 'get')) {
 /* Remove optin */
 elseif (new_route('/DDWT18/final/removeoptin/', 'post')) {
     if ( !check_login() ) {
-        redirect('/DDWT18/final/login/');
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To remove an optin you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    if ($userinfo['role'] == '1') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot remove an optin.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
     }
     /* Remove optin in database */
     $feedback = remove_optin($db, $_POST['room_id'], $_POST['user_id']);
