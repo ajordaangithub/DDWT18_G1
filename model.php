@@ -170,6 +170,34 @@ function get_rooms_tenant($pdo){
     return $series_exp;
 }
 
+function get_rooms_tenant_order($pdo, $order){
+    if ($order == '"size up"') {
+        $stmt = $pdo->prepare('SELECT * FROM rooms ORDER BY size ASC');
+    }
+    elseif ($order == '"price up"') {
+        $stmt = $pdo->prepare('SELECT * FROM rooms ORDER BY price ASC');
+    }
+    elseif ($order == '"size down"') {
+        $stmt = $pdo->prepare('SELECT * FROM rooms ORDER BY size DESC');
+    }
+    elseif ($order == '"price down"') {
+        $stmt = $pdo->prepare('SELECT * FROM rooms ORDER BY price DESC');
+    }
+    else {
+        $stmt = $pdo->prepare('SELECT * FROM rooms');
+    }
+    $stmt->execute();
+    $series = $stmt->fetchAll();
+    $series_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($series as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $series_exp;
+}
 /**
  * Get array with all listed series from the database
  * @param object $pdo database object
@@ -190,6 +218,35 @@ function get_rooms_owner($pdo, $userid){
     return $series_exp;
 }
 
+function get_rooms_owner_order($pdo, $userid, $order){
+    if ($order == '"size up"') {
+        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ? ORDER BY size ASC');
+    }
+    elseif ($order == '"price up"') {
+        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ? ORDER BY price ASC');
+    }
+    elseif ($order == '"size down"') {
+        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ? ORDER BY size DESC');
+    }
+    elseif ($order == '"price down"') {
+        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ? ORDER BY price DESC');
+    }
+    else {
+        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ?');
+    }
+    $stmt->execute([$userid]);
+    $series = $stmt->fetchAll();
+    $series_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($series as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $series_exp;
+}
+
 /**
  * Creats a Bootstrap table with a list of series
  * @param PDO $pdo database object
@@ -197,7 +254,18 @@ function get_rooms_owner($pdo, $userid){
  * @return string
  */
 function get_room_table($series, $pdo){
-    $card_exp = '<div class="card-body"> </div>';
+    $card_exp = '<div class="card-body"><form action="/DDWT18/final/overview/" method="post">
+    <div class="form-group">
+      <label for="inputUsername">Order By</label>
+      <select name="order" class="form-control" id="inputUsername">
+      <option> </option>
+       <option value="price up">Price Up</option>
+       <option value="price down">Price Down</option>
+       <option value="size up">Size Up</option>
+       <option value="size down">Size Down</option>
+      </select><br>
+   <button type="submit" class="btn btn-primary">Order Now</button></div>
+  </form></div>';
     foreach ($series as $key => $value) {
         $card_exp .= '<div class="card" id="overview-card" style="width: 350px;">
   <img class="card-img-top" src="../house.jpg" alt="Card image cap" height="350px">

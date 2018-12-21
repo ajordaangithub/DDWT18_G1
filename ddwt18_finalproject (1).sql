@@ -55,8 +55,8 @@ CREATE TABLE `rooms` (
   `id` int(11) NOT NULL,
   `address` varchar(255) COLLATE utf8_bin NOT NULL,
   `type` varchar(255) COLLATE utf8_bin NOT NULL,
-  `price` varchar(255) COLLATE utf8_bin NOT NULL,
-  `size` varchar(255) COLLATE utf8_bin NOT NULL,
+  `price` int(3) COLLATE utf8_bin NOT NULL,
+  `size` int(3) COLLATE utf8_bin NOT NULL,
   `owner` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -65,7 +65,7 @@ CREATE TABLE `rooms` (
 --
 
 INSERT INTO `rooms` (`id`, `address`, `type`, `price`, `size`, `owner`) VALUES
-(1, 'De Tuinen 26', 'Room in high house', '300.00', '12', 1),
+(1, 'De Tuinen 26', 'Room in high house', '300', '12', 1),
 (2, 'Plutolaan 401', 'Room in appartment', '365', '10', 1),
 (3, 'Tolhuis 1', 'Room in appartment', '200', '10', 1),
 (4, 'Haverlanden 105', 'Room in house', '150', '6', 5),
@@ -99,7 +99,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `birth_date`, `r
 (1, 'huppelputje', '$2y$10$hn9Iuj.uqsjvqYWz5ot8SOtijBCZgEwGVazIrBJTgT.A6K1HE04uC', 'Jan Hooghe', '1998-12-19', 1, 'Someone', 'Teacher English', 'Dutch', 'janhooghe@example.com', 639283712),
 (2, 'melodyman', '$2y$10$56cXE5/nuzOk6qeXat04YOM7JIdKSCXfjjc8IB2g22jDJqdNOFMmy', 'Jannick Akkermans', '1998-10-22', 2, 'A normal student.', 'Information Science', 'Dutch', 'jakkermans@example.com', 619283729),
 (3, 'hubbahubba', '$2y$10$kGRSyi52RN4W9GMtKnz9jewFrGUdtw6zjFeJq45mfLdVIkwf6pRmi', 'Huub Hartje', '2010-09-03', 2, 'Someone looking for a room.', 'Physics', 'Dutch', 'hubbahubba@hubba.com', 693827492),
-(4, 'huppeldepup', '$2y$10$.srkimlId3NchBB5hbzGyenH8dc2GzFuIfJ.JEpwIKEh5PoRwJQ6m', 'Jantje Iets', '1987-08-18', 2, 'I\'m a normal person', 'Psychology', 'Dutch', 'huppeldepup@example.com', 638192831),
+(4, 'huppeldepup', '$2y$10$.srkimlId3NchBB5hbzGyenH8dc2GzFuIfJ.JEpwIKEh5PoRwJQ6m', 'Jantje Iets', '1987-08-18', 2, 'Im a normal person', 'Psychology', 'Dutch', 'huppeldepup@example.com', 638192831),
 (5, 'hockeyman', '$2y$10$06htVsuSqGj0Y59RxRTm8OhDxI1d5fYEluUawPz13Adu7tKTzuWo.', 'Hockey Man', '1999-10-30', 1, 'Owner', 'Chef', 'Dutch', 'hockeyman@hockey.com', 693871093);
 
 --

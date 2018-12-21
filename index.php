@@ -86,12 +86,23 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
 
     /* Page content */
     $page_subtitle = 'The overview of all rooms';
-    if ($userinfo['role'] == 1) {
-        $page_content = 'Here you find all rooms you have listed on Rooms Overview.';
-        $left_content = get_room_table(get_rooms_owner($db, get_user_id()), $db);
-    } elseif ($userinfo['role'] == 2) {
-        $page_content = 'Here you find all rooms listed on Rooms Overview.';
-        $left_content = get_room_table(get_rooms_tenant($db), $db);
+    if ( isset($_GET['order']) ) {
+        if ($userinfo['role'] == 1) {
+            $page_content = 'Here you find all rooms you have listed on Rooms Overview.';
+            $left_content = get_room_table(get_rooms_owner_order($db, get_user_id(), $_GET['order']), $db);
+        } elseif ($userinfo['role'] == 2) {
+            $page_content = 'Here you find all rooms listed on Rooms Overview.';
+            $left_content = get_room_table(get_rooms_tenant_order($db, $_GET['order']), $db);
+        }
+    }
+    else {
+        if ($userinfo['role'] == 1) {
+            $page_content = 'Here you find all rooms you have listed on Rooms Overview.';
+            $left_content = get_room_table(get_rooms_owner($db, get_user_id()), $db);
+        } elseif ($userinfo['role'] == 2) {
+            $page_content = 'Here you find all rooms listed on Rooms Overview.';
+            $left_content = get_room_table(get_rooms_tenant($db), $db);
+        }
     }
 
     if ( isset($_GET['error_msg']) ) {
@@ -101,6 +112,16 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
 
     /* Choose Template */
     include use_template('main');
+}
+
+
+elseif (new_route('/DDWT18/final/overview/', 'post')) {
+    /* Check if logged in */
+    /* Add room to database */
+    $feedback = $_POST['order'];
+
+    /* Redirect to room GET route */
+    redirect(sprintf('/DDWT18/final/overview/?order=%s', json_encode($feedback)));
 }
 
 /* Single Room */
