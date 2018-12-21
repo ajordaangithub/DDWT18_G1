@@ -808,8 +808,8 @@ function get_optin_info($pdo, $roomid, $userid) {
 function remove_account($pdo, $userid) {
     session_start();
     session_destroy();
-    $stmt = $pdo->prepare('DELETE FROM users WHERE id = ?');
-    $stmt->execute([$userid]);
+    $stmt = $pdo->prepare('DELETE FROM users WHERE id = ?; DELETE FROM optins WHERE userid = ?');
+    $stmt->execute([$userid, $userid]);
     $deleted = $stmt->rowCount();
     if ($deleted == 1) {
         return [
