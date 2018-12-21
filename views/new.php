@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="/DDWT18/final/css/bootstrap.min.css">
 
     <!-- Own CSS -->
     <link rel="stylesheet" href="/DDWT18/final/css/main.css">
@@ -72,6 +72,7 @@
                 </div> -->
                 
                 <?php if(isset($room_id)){ ?> <input type="hidden" name="room_id" value=" <?php echo $room_id ?>"><?php } ?>
+                <?php if(isset($room_owner)){ ?> <input type="hidden" name="room_owner" value=" <?php echo $room_owner ?>"><?php } ?>
                 
                 <div class="form-group row">
                     <div class="col-sm-10">

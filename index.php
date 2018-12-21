@@ -87,22 +87,12 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
     /* Page content */
     $page_subtitle = 'The overview of all rooms';
     if ( isset($_GET['order']) ) {
-        if ($userinfo['role'] == 1) {
-            $page_content = 'Here you find all rooms you have listed on Rooms Overview.';
-            $left_content = get_room_table(get_rooms_owner_order($db, get_user_id(), $_GET['order']), $db);
-        } elseif ($userinfo['role'] == 2) {
-            $page_content = 'Here you find all rooms listed on Rooms Overview.';
-            $left_content = get_room_table(get_rooms_tenant_order($db, $_GET['order']), $db);
-        }
+        $page_content = 'Here you find all rooms listed on Rooms Overview.';
+        $left_content = get_room_table(get_rooms_tenant_order($db, $_GET['order']), $db);
     }
     else {
-        if ($userinfo['role'] == 1) {
-            $page_content = 'Here you find all rooms you have listed on Rooms Overview.';
-            $left_content = get_room_table(get_rooms_owner($db, get_user_id()), $db);
-        } elseif ($userinfo['role'] == 2) {
-            $page_content = 'Here you find all rooms listed on Rooms Overview.';
-            $left_content = get_room_table(get_rooms_tenant($db), $db);
-        }
+        $page_content = 'Here you find all rooms listed on Rooms Overview.';
+        $left_content = get_room_table(get_rooms_tenant($db), $db);
     }
 
     if ( isset($_GET['error_msg']) ) {
@@ -144,16 +134,17 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
 
     if ($current_user == $userid) {
         $display_buttons = True;
+        $display_optins = True;
+        $left_content = get_optin_table_owner(get_optins_owner($db, $room_id), $db);
     } else {
         $display_buttons = False;
+        $display_optins = False;
     }
 
     $optins = check_optins($db, $current_user, $room_id);
     if ($optins)
         if ($userinfo['role'] == 1) {
             $display_optin = False;
-            $display_optins = True;
-            $left_content = get_optin_table_owner(get_optins_owner($db, $room_id), $db);
         } else {
             $display_optin = True;
             $display_optins = True;
@@ -201,6 +192,7 @@ elseif (new_route('/DDWT18/final/optin/', 'post')) {
         redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
             json_encode($error_msg)));
     }
+    $userinfo = get_userinfo($db, $_SESSION['user_id']);
     if ($userinfo['role'] == '1') {
         $error_msg = [
             'type' => 'warning',
@@ -297,6 +289,7 @@ elseif (new_route('/DDWT18/final/edit/', 'get')) {
         redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
             json_encode($error_msg)));
     }
+    $userinfo = get_userinfo($db, $_SESSION['user_id']);
     if ($userinfo['role'] == '2') {
         $error_msg = [
             'type' => 'warning',
@@ -308,6 +301,7 @@ elseif (new_route('/DDWT18/final/edit/', 'get')) {
     /* Get room info from db */
     $room_id = $_GET['room_id'];
     $room_info = get_roominfo($db, $room_id);
+    $room_owner = $room_info['owner'];
 
     /* Page info */
     $page_title = 'Edit Room';
@@ -344,6 +338,7 @@ elseif (new_route('/DDWT18/final/edit/', 'post')) {
         redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
             json_encode($error_msg)));
     }
+    $userinfo = get_userinfo($db, $_SESSION['user_id']);
     if ($userinfo['role'] == '2') {
         $error_msg = [
             'type' => 'warning',
@@ -375,6 +370,7 @@ elseif (new_route('/DDWT18/final/remove/', 'post')) {
         redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
             json_encode($error_msg)));
     }
+    $userinfo = get_userinfo($db, get_user_id());
     if ($userinfo['role'] == '2') {
         $error_msg = [
             'type' => 'warning',
@@ -423,7 +419,8 @@ elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
         $left_content = get_optin_table_tenant(get_alloptins_tenant($db, $_SESSION['user_id']), $db);
     } elseif ($role == 1) {
         $page_subtitle = sprintf("View all your submitted rooms");
-        $display_optins = False;
+        $display_optins = True;
+        $left_content = get_room_table(get_rooms_owner($db, $_SESSION['user_id']), $db);
     }
 
     /* Get error message from POST route */
@@ -559,6 +556,7 @@ elseif (new_route('/DDWT18/final/removeoptin/', 'post')) {
         redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
             json_encode($error_msg)));
     }
+    $userinfo = get_userinfo($db, get_user_id());
     if ($userinfo['role'] == '1') {
         $error_msg = [
             'type' => 'warning',

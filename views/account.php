@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="/DDWT18/final/css/bootstrap.min.css">
 
     <!-- Own CSS -->
     <link rel="stylesheet" href="/DDWT18/final/css/main.css">
@@ -72,8 +72,12 @@
     <div class="optin">
         <?php if($display_optins) {?>
             <?php if(isset($left_content)){?>
+                <?php if ($role == 2) {?>
                 <h1 id="header">Current Opt-ins</h1>
-                <?php echo $left_content;} ?>
+                <?php echo $left_content;} else {?>
+                    <h1 id="header">Current submitted rooms</h1>
+                    <?php echo $left_content;}?>
+                <?php }?>
         <?php }?>
     </div>
 </div>

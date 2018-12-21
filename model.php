@@ -399,7 +399,7 @@ function update_room($pdo, $room_info, $user_id) {
     }
 
     /* Check who added the room */
-    elseif ( $room_info['owner'] != $user_id){
+    elseif ( $room_info['room_owner'] != $user_id){
         return [
             'type' => 'danger',
             'message' => sprintf("You are not allowed to edit this, since this room was not added by you.")
