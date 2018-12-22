@@ -54,6 +54,7 @@ INSERT INTO `optins` (`roomid`, `userid`, `date`, `message`) VALUES
 CREATE TABLE `rooms` (
   `id` int(11) NOT NULL,
   `address` varchar(255) COLLATE utf8_bin NOT NULL,
+  `city` VARCHAR(255) COLLATE utf8_bin NOT NULL,
   `type` varchar(255) COLLATE utf8_bin NOT NULL,
   `price` int(3) COLLATE utf8_bin NOT NULL,
   `size` int(3) COLLATE utf8_bin NOT NULL,
@@ -64,12 +65,12 @@ CREATE TABLE `rooms` (
 -- Dumping data for table `rooms`
 --
 
-INSERT INTO `rooms` (`id`, `address`, `type`, `price`, `size`, `owner`) VALUES
-(1, 'De Tuinen 26', 'Room in high house', '300', '12', 1),
-(2, 'Plutolaan 401', 'Room in appartment', '365', '10', 1),
-(3, 'Tolhuis 1', 'Room in appartment', '200', '10', 1),
-(4, 'Haverlanden 105', 'Room in house', '150', '6', 5),
-(5, 'Herestraat 10', 'Room in appartment', '345', '8', 1);
+INSERT INTO `rooms` (`id`, `address`, `city`, `type`, `price`, `size`, `owner`) VALUES
+(1, 'De Tuinen 26', 'Groningen', 'Room in high house', '300', '12', 1),
+(2, 'Plutolaan 401', 'Utrecht', 'Room in appartment', '365', '10', 1),
+(3, 'Tolhuis 1', 'Groningen', 'Room in appartment', '200', '10', 1),
+(4, 'Haverlanden 105', 'Groningen', 'Room in house', '150', '6', 5),
+(5, 'Herestraat 10', 'Utrecht', 'Room in appartment', '345', '8', 1);
 
 -- --------------------------------------------------------
 

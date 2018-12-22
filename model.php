@@ -170,22 +170,29 @@ function get_rooms_tenant($pdo){
     return $series_exp;
 }
 
-function get_rooms_tenant_order($pdo, $order){
-    if ($order == '"size up"') {
-        $stmt = $pdo->prepare('SELECT * FROM rooms ORDER BY size ASC');
+function get_rooms_tenant_order($pdo, $status){
+    $feedback = json_decode($status, True);
+    $order = $feedback['order'];
+    $filter = $feedback['filter'];
+    $sql = 'SELECT * FROM rooms';
+    if ($filter) {
+        $sql .= ' WHERE city = "';
+        $sql .= $filter;
+        $sql .= '"';
     }
-    elseif ($order == '"price up"') {
-        $stmt = $pdo->prepare('SELECT * FROM rooms ORDER BY price ASC');
+    if ($order == 'size up') {
+        $sql .= ' ORDER BY size ASC';
     }
-    elseif ($order == '"size down"') {
-        $stmt = $pdo->prepare('SELECT * FROM rooms ORDER BY size DESC');
+    elseif ($order == 'price up') {
+        $sql .= ' ORDER BY price ASC';
     }
-    elseif ($order == '"price down"') {
-        $stmt = $pdo->prepare('SELECT * FROM rooms ORDER BY price DESC');
+    elseif ($order == 'size down') {
+        $sql .= ' ORDER BY size DESC';
     }
-    else {
-        $stmt = $pdo->prepare('SELECT * FROM rooms');
+    elseif ($order == 'price down') {
+        $sql .= ' ORDER BY price DESC';
     }
+    $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $series = $stmt->fetchAll();
     $series_exp = Array();
@@ -218,22 +225,29 @@ function get_rooms_owner($pdo, $userid){
     return $series_exp;
 }
 
-function get_rooms_owner_order($pdo, $userid, $order){
-    if ($order == '"size up"') {
-        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ? ORDER BY size ASC');
+function get_rooms_owner_order($pdo, $userid, $status){
+    $feedback = json_decode($status, True);
+    $order = $feedback['order'];
+    $filter = $feedback['filter'];
+    $sql = 'SELECT * FROM rooms WHERE owner = ?';
+    if ($filter) {
+        $sql .= ' AND city = "';
+        $sql .= $filter;
+        $sql .= '"';
     }
-    elseif ($order == '"price up"') {
-        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ? ORDER BY price ASC');
+    if ($order == 'size up') {
+        $sql .= ' ORDER BY size ASC';
     }
-    elseif ($order == '"size down"') {
-        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ? ORDER BY size DESC');
+    elseif ($order == 'price up') {
+        $sql .= ' ORDER BY price ASC';
     }
-    elseif ($order == '"price down"') {
-        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ? ORDER BY price DESC');
+    elseif ($order == 'size down') {
+        $sql .= ' ORDER BY size DESC';
     }
-    else {
-        $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ?');
+    elseif ($order == 'price down') {
+        $sql .= ' ORDER BY price DESC';
     }
+    $stmt = $pdo->prepare($sql);
     $stmt->execute([$userid]);
     $series = $stmt->fetchAll();
     $series_exp = Array();
@@ -247,6 +261,21 @@ function get_rooms_owner_order($pdo, $userid, $order){
     return $series_exp;
 }
 
+function get_cities($pdo){
+    $stmt = $pdo->prepare('SELECT DISTINCT city FROM rooms');
+    $stmt->execute();
+    $cities = $stmt->fetchAll();
+    $cities_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($cities as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $cities_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $cities_exp;
+}
+
 /**
  * Creats a Bootstrap table with a list of series
  * @param PDO $pdo database object
@@ -254,6 +283,7 @@ function get_rooms_owner_order($pdo, $userid, $order){
  * @return string
  */
 function get_room_table($series, $pdo){
+    $cities = get_cities($pdo);
     $card_exp = '<div class="card-body"><form action="/DDWT18/final/overview/" method="post">
     <div class="form-group">
       <label for="inputUsername">Order By</label>
@@ -264,13 +294,27 @@ function get_room_table($series, $pdo){
        <option value="size up">Size Up</option>
        <option value="size down">Size Down</option>
       </select><br>
-   <button type="submit" class="btn btn-primary">Order Now</button></div>
+      <label for="inputUsername">Filter By</label>
+      <select name="filter" class="form-control" id="inputUsername">
+      <option> </option>';
+    foreach ($cities as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $card_exp .= '<option value="';
+            $card_exp .= $user_input;
+            $card_exp .= '">';
+            $card_exp .= $user_input;
+            $card_exp .= '</option>';
+        }
+    }
+    $card_exp .= '
+      </select><br>
+   <button type="submit" class="btn btn-primary">Order/Filter</button></div>
   </form></div>';
     foreach ($series as $key => $value) {
         $card_exp .= '<div class="card" id="overview-card" style="width: 350px;">
   <img class="card-img-top" src="../house.jpg" alt="Card image cap" height="350px">
   <div class="card-body">
-    <h5 class="card-title"><i class="fas fa-home"></i> '.$value['address'].'</h5>
+    <h5 class="card-title"><i class="fas fa-home"></i> '.$value['address'].', '.$value['city'].'</h5>
     <p class="card-text"><i class="fas fa-user"></i> '.get_username($pdo,$value['owner'])['full_name'].'</p>
     <p class="card-text"><i class="fas fa-euro-sign"></i> '.$value['price'].'</p>
     <p class="card-text"><i class="fas fa-chair"></i> '.$value['size'].' m2</p>

@@ -86,9 +86,9 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
 
     /* Page content */
     $page_subtitle = 'The overview of all rooms';
-    if ( isset($_GET['order']) ) {
+    if ( isset($_GET['status']) ) {
         $page_content = 'Here you find all rooms listed on Rooms Overview.';
-        $left_content = get_room_table(get_rooms_tenant_order($db, $_GET['order']), $db);
+        $left_content = get_room_table(get_rooms_tenant_order($db, $_GET['status']), $db);
     }
     else {
         $page_content = 'Here you find all rooms listed on Rooms Overview.';
@@ -108,10 +108,12 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
 elseif (new_route('/DDWT18/final/overview/', 'post')) {
     /* Check if logged in */
     /* Add room to database */
-    $feedback = $_POST['order'];
-
-    /* Redirect to room GET route */
-    redirect(sprintf('/DDWT18/final/overview/?order=%s', json_encode($feedback)));
+    $status = [
+        'order' => $_POST['order'],
+        'filter' => $_POST['filter']
+    ];
+    redirect(sprintf('/DDWT18/final/overview/?status=%s',
+        json_encode($status)));
 }
 
 /* Single Room */
