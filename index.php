@@ -181,6 +181,9 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
     if ( isset($_GET['error_msg']) ) {
         $error_msg = get_error($_GET['error_msg']);
     }
+
+
+
     /* Choose Template */
     include use_template('room');
 }
@@ -247,6 +250,8 @@ elseif (new_route('/DDWT18/final/add/', 'get')) {
     if ( isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
+
+
 
     /* Choose Template */
     include use_template('new');
@@ -326,6 +331,8 @@ elseif (new_route('/DDWT18/final/edit/', 'get')) {
         $error_msg = get_error($_GET['error_msg']);
     }
 
+
+
     /* Choose Template */
     include use_template('new');
 }
@@ -355,7 +362,11 @@ elseif (new_route('/DDWT18/final/edit/', 'post')) {
     $room_id = $_POST['room_id'];
 
     /* Update room to database */
+    $filearray = reArrayFiles($_FILES['userfile']);
     $feedback = update_room($db, $_POST, $_SESSION['user_id']);
+
+
+
 
     /* Redirect to room GET route */
     redirect(sprintf('/DDWT18/final/room/?room_id='.$room_id.'?error_msg=%s', json_encode($feedback)));
@@ -558,7 +569,7 @@ elseif (new_route('/DDWT18/final/login/', 'post')) {
     }
 
 }
-
+/* Logout get */
 elseif (new_route('/DDWT18/final/logout/', 'get')) {
     if ( !check_login() ) {
         $error_msg = [
@@ -651,4 +662,83 @@ elseif (new_route('/DDWT18/final/removeaccount/', 'get')) {
 
     /* Choose Template */
     include use_template('main');
+}
+
+/* IMG management GET */
+elseif (new_route('/DDWT18/final/img/', 'get')) {
+    /* Check if logged in */
+    if (!check_login()) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To manage images you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    $userinfo = get_userinfo($db, $_SESSION['user_id']);
+    if ($userinfo['role'] == '2') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot edit images.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    /* Get room info from db */
+    $room_id = trim($_GET['room_id']);
+    $room_info = get_roominfo($db, $room_id);
+    $room_owner = $room_info['owner'];
+
+    /* Page info */
+    $page_title = 'Room images';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT18' => na('/DDWT18/', False),
+        'Final' => na('/DDWT18/final/', False),
+        sprintf("Images %s", $room_info['address']) => na('/DDWT18/final/new/', True)
+    ]);
+    $navigation = get_navigation($template, 2);
+
+    /* Page content */
+    $page_subtitle = sprintf("Add or remove images for %s", $room_info['address']);
+    $form_action = '/DDWT18/final/img/';
+
+    /* Get error message from POST route */
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    pre_r($_GET);
+
+    /* Choose Template */
+    include use_template('img');
+}
+
+
+
+/* IMG management POST */
+elseif (new_route('/DDWT18/final/img/', 'post')) {
+    /* Check if logged in */
+    if (!check_login()) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To manage images you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    $userinfo = get_userinfo($db, $_SESSION['user_id']);
+    if ($userinfo['role'] == '2') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot edit images.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+
+    $filearray = reArrayFiles($_FILES['userfile']);
+    $room_id = $_POST['room_id'];
+    $feedback = upload_imgs($filearray, $room_id);
+    /* Redirect to img GET route */
+
+    redirect(sprintf('/DDWT18/final/img/?room_id=%s',$room_id));
 }
