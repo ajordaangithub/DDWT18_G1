@@ -155,25 +155,14 @@ function count_users($pdo) {
  * @param object $pdo database object
  * @return array Associative array with all series
  */
-function get_rooms_tenant($pdo){
-    $stmt = $pdo->prepare('SELECT * FROM rooms');
-    $stmt->execute();
-    $series = $stmt->fetchAll();
-    $series_exp = Array();
-
-    /* Create array with htmlspecialchars */
-    foreach ($series as $key => $value){
-        foreach ($value as $user_key => $user_input) {
-            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
-        }
+function get_rooms_tenant($pdo, $status){
+    $filter = $order = 0;
+    if($status && array_key_exists('status', $status)) {
+        $status = $status['status'];
+        $feedback = json_decode($status, True);
+        $order = $feedback['order'];
+        $filter = $feedback['filter'];
     }
-    return $series_exp;
-}
-
-function get_rooms_tenant_order($pdo, $status){
-    $feedback = json_decode($status, True);
-    $order = $feedback['order'];
-    $filter = $feedback['filter'];
     $sql = 'SELECT * FROM rooms';
     if ($filter) {
         $sql .= ' WHERE city = "';
@@ -210,25 +199,14 @@ function get_rooms_tenant_order($pdo, $status){
  * @param object $pdo database object
  * @return array Associative array with all series
  */
-function get_rooms_owner($pdo, $userid){
-    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ?');
-    $stmt->execute([$userid]);
-    $series = $stmt->fetchAll();
-    $series_exp = Array();
-
-    /* Create array with htmlspecialchars */
-    foreach ($series as $key => $value){
-        foreach ($value as $user_key => $user_input) {
-            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
-        }
+function get_rooms_owner($pdo, $userid, $status){
+    $filter = $order = 0;
+    if($status && array_key_exists('status', $status)) {
+        $status = $status['status'];
+        $feedback = json_decode($status, True);
+        $order = $feedback['order'];
+        $filter = $feedback['filter'];
     }
-    return $series_exp;
-}
-
-function get_rooms_owner_order($pdo, $userid, $status){
-    $feedback = json_decode($status, True);
-    $order = $feedback['order'];
-    $filter = $feedback['filter'];
     $sql = 'SELECT * FROM rooms WHERE owner = ?';
     if ($filter) {
         $sql .= ' AND city = "';
@@ -282,9 +260,11 @@ function get_cities($pdo){
  * @param array $series with series from the db
  * @return string
  */
-function get_room_table($series, $pdo){
+function get_room_table($series, $pdo, $route){
     $cities = get_cities($pdo);
-    $card_exp = '<div class="card-body"><form action="/DDWT18/final/overview/" method="post">
+    $card_exp = '<div class="card-body"><form action="/DDWT18/final/';
+    $card_exp .= $route;
+    $card_exp .= '" method="post">
     <div class="form-group">
       <label for="inputUsername">Order By</label>
       <select name="order" class="form-control" id="inputUsername">
@@ -341,6 +321,11 @@ function add_room($pdo, $room_info, $user_id){
             'type' => 'danger',
             'message' => 'Address field empty. Room not added.'
         ];
+    } elseif (empty($room_info['City'])){
+        return [
+            'type' => 'danger',
+            'message' => 'City field empty. Room not added.'
+        ];
     } elseif (empty($room_info['Type'])){
         return [
             'type' => 'danger',
@@ -373,9 +358,10 @@ function add_room($pdo, $room_info, $user_id){
 
     /* Add room */
     else {
-        $stmt = $pdo->prepare("INSERT INTO rooms (address, type, price, size, owner) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO rooms (address, city, type, price, size, owner) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $room_info['Address'],
+            $room_info['City'],
             $room_info['Type'],
             $room_info['Price'],
             $room_info['Size'],
@@ -406,6 +392,11 @@ function update_room($pdo, $room_info, $user_id) {
         return [
             'type' => 'danger',
             'message' => 'Address field empty. Room not updated.'
+        ];
+    } elseif (empty($room_info['City'])){
+        return [
+            'type' => 'danger',
+            'message' => 'City field empty. Room not updated.'
         ];
     } elseif (empty($room_info['Type'])){
         return [
@@ -452,9 +443,10 @@ function update_room($pdo, $room_info, $user_id) {
 
     /* Update room */
     else {
-        $stmt = $pdo->prepare("UPDATE rooms SET address = ?, type = ?, price = ?, size = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE rooms SET address = ?, city = ?, type = ?, price = ?, size = ? WHERE id = ?");
         $stmt->execute([
             $room_info['Address'],
+            $room_info['City'],
             $room_info['Type'],
             $room_info['Price'],
             $room_info['Size'],
@@ -898,6 +890,23 @@ function remove_optin($pdo, $roomid, $userid) {
     }
 }
 
+function remove_optins($pdo, $userid) {
+    $stmt = $pdo->prepare('DELETE FROM optins WHERE userid = ?');
+    $stmt->execute([$userid]);
+    $deleted = $stmt->rowCount();
+    if ($deleted == 1) {
+        return [
+            'type' => 'success',
+            'message' => 'Opt-ins were successfully deleted.'
+        ];
+    } else {
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred. The optins were not removed.'
+        ];
+    }
+}
+
 /**
  * Creats a Bootstrap table with a list of series
  * @param PDO $pdo database object
@@ -915,6 +924,20 @@ function get_optin_info($pdo, $roomid, $userid) {
         $optin_info_exp[$key] = htmlspecialchars($value);
     }
     return $optin_info_exp;
+}
+
+function count_optins($pdo, $userid) {
+    $stmt = $pdo->prepare("SELECT * FROM optins WHERE userid = ?");
+    $stmt->execute([$userid]);
+    $optins = $stmt->rowCount();
+    return $optins;
+}
+
+function count_owned_rooms($pdo, $userid) {
+    $stmt = $pdo->prepare("SELECT * FROM rooms WHERE owner = ?");
+    $stmt->execute([$userid]);
+    $optins = $stmt->rowCount();
+    return $optins;
 }
 
 function remove_account($pdo, $userid) {

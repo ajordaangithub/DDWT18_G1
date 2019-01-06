@@ -88,11 +88,11 @@ elseif (new_route('/DDWT18/final/overview/', 'get')) {
     $page_subtitle = 'The overview of all rooms';
     if ( isset($_GET['status']) ) {
         $page_content = 'Here you find all rooms listed on Rooms Overview.';
-        $left_content = get_room_table(get_rooms_tenant_order($db, $_GET['status']), $db);
+        $left_content = get_room_table(get_rooms_tenant($db, $_GET), $db, 'overview');
     }
     else {
         $page_content = 'Here you find all rooms listed on Rooms Overview.';
-        $left_content = get_room_table(get_rooms_tenant($db), $db);
+        $left_content = get_room_table(get_rooms_tenant($db, $_GET), $db, 'overview');
     }
 
     if ( isset($_GET['error_msg']) ) {
@@ -161,7 +161,8 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
     /*For now, $display_buttons is true. Has to be altered when authentication is done.*/
 
     /* Page info */
-    $page_title = $room_info['address'];
+    $add = $room_info['address'] . ', ' . $room_info['city'];
+    $page_title = $add;
     $breadcrumbs = get_breadcrumbs([
         'DDWT18' => na('/DDWT18/', False),
         'Final' => na('/DDWT18/final/', False),
@@ -171,7 +172,7 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
     $navigation = get_navigation($template, 2);
 
     /* Page content */
-    $page_subtitle = sprintf("Information about %s", $room_info['address']);
+    $page_subtitle = sprintf("Information about %s", $add);
     $room_type = $room_info['type'];
     $room_price = $room_info['price'];
     $room_size = $room_info['size'];
@@ -415,14 +416,20 @@ elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
     /* page content */
     $page_content = '';
     $role = get_userinfo($db, $_SESSION['user_id'])['role'];
-    if ($role == 2) {
+    if ($role == 2 && count_optins($db, $_SESSION['user_id'])) {
         $page_subtitle = sprintf("View all your submitted opt-ins");
         $display_optins = True;
         $left_content = get_optin_table_tenant(get_alloptins_tenant($db, $_SESSION['user_id']), $db);
-    } elseif ($role == 1) {
+    } elseif ($role == 2) {
+        $page_subtitle = sprintf("You have no optins yet");
+        $display_optins = False;
+    } elseif ($role == 1 && count_owned_rooms($db, $_SESSION['user_id'])) {
         $page_subtitle = sprintf("View all your submitted rooms");
         $display_optins = True;
-        $left_content = get_room_table(get_rooms_owner($db, $_SESSION['user_id']), $db);
+        $left_content = get_room_table(get_rooms_owner($db, $_SESSION['user_id'], $_GET), $db, 'myaccount');
+    } elseif ($role == 1) {
+        $page_subtitle = sprintf("You have no rooms to rent yet.");
+        $display_optins = False;
     }
 
     /* Get error message from POST route */
@@ -432,6 +439,25 @@ elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
 
     /* Choose Template */
     include use_template('account');
+}
+
+elseif (new_route('/DDWT18/final/myaccount/', 'post')) {
+    /* Check if logged in */
+    if ( !check_login() ) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'Seriously, you think you can access the my account page without being logged in...'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    /* Add room to database */
+    $status = [
+        'order' => $_POST['order'],
+        'filter' => $_POST['filter']
+    ];
+    redirect(sprintf('/DDWT18/final/myaccount/?status=%s',
+        json_encode($status)));
 }
 
 
@@ -569,6 +595,36 @@ elseif (new_route('/DDWT18/final/removeoptin/', 'post')) {
     }
     /* Remove optin in database */
     $feedback = remove_optin($db, $_POST['room_id'], $_POST['user_id']);
+    $error_msg = get_error($feedback);
+
+    redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s',
+        json_encode($feedback)));
+
+
+    /* Choose Template */
+    include use_template('main');
+}
+
+elseif (new_route('/DDWT18/final/removeoptins/', 'post')) {
+    if ( !check_login() ) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To remove optins you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    $userinfo = get_userinfo($db, get_user_id());
+    if ($userinfo['role'] == '1') {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'You cannot remove optins.'
+        ];
+        redirect(sprintf('/DDWT18/final/overview/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    /* Remove optin in database */
+    $feedback = remove_optins($db, $_POST['user_id']);
     $error_msg = get_error($feedback);
 
     redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s',
