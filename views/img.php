@@ -39,5 +39,13 @@
                 <?php if(isset($room_id)){ ?> <input type="hidden" name="room_id" value=" <?php echo $room_id ?>"><?php } ?>
                 <?php if(isset($room_owner)){ ?> <input type="hidden" name="room_owner" value=" <?php echo $room_owner ?>"><?php } ?>
             </form>
+        <div class="row">
+            <?php get_images($room_id, 1) ?>
         </div>
         </div>
+
+
+
+
+
+        <?php if(isset($left_content)){echo $left_content;} ?>

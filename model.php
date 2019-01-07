@@ -996,6 +996,7 @@ function pre_r($array) {
  */
 
 function upload_imgs($file_array, $room_id) {
+    $room_id = trim($room_id);
     $phpFileUploadErrors = array(
         1 => 'file exceeds maximum php ini filesize',
         2 => 'file exceeds html form filesize',
@@ -1041,4 +1042,51 @@ function upload_imgs($file_array, $room_id) {
         'message' => 'files uploaded succesfully'
     ];
 }
+
+function get_images($room_id, $displaybuttons){
+    $dir_path = "images/$room_id";
+
+    if(is_dir($dir_path)) {
+        $files = scandir($dir_path, 1);
+        for($i = 0; $i < count($files); $i++) {
+            if($files[$i] !='.' && $files[$i] !='..') {
+
+                echo "<div class='card' style='margin-right: 10px;'><img src='/DDWT18/final/$dir_path/$files[$i]' alt='img' width='200' height='200'><br>";
+                if ($displaybuttons) {
+                    echo " <form action='/DDWT18/final/img' method='POST'>
+                    <input type='hidden' value='$files[$i]' name='imgname'>
+                    <input type='hidden' value='$room_id' name='room_id'>
+                    <button type='submit' class='btn btn-warning'>Set as thumbnail</button>
+                    </form>";
+
+                    echo " <form action='/DDWT18/final/img' method='POST'>
+                    <input type='hidden' value='$files[$i]' name='imgname'>
+                    <input type='hidden' value='$room_id' name='room_id'>
+                    <button type='submit' class='btn btn-danger'>Remove</button>
+                    
+                    </form></div>";
+
+                }
+                $file = pathinfo($files[$i]);
+                $extension = $file['extension'];
+            }
+        }
+    }
+    else {
+        return "<div class='row'>No images uploaded for this room so far</div>";
+    }
+
+}
+
+function remove_img($room_id, $imgname) {
+    $room_id = trim($room_id);
+    $dir_path = "images/$room_id/$imgname";
+    unlink($dir_path);
+    return [
+        'type' => 'succes',
+        'message' => 'image removed succesfully'
+    ];
+}
+
+
 

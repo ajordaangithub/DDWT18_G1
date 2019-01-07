@@ -9,7 +9,7 @@
 session_start();
 
 include 'model.php';
-$db = connect_db('localhost:3307', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
+$db = connect_db('localhost:3306', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
 $nbr_rooms = count_rooms($db);
 $nbr_users = count_users($db);
 $right_column = use_template('cards');
@@ -683,7 +683,7 @@ elseif (new_route('/DDWT18/final/img/', 'get')) {
     $navigation = get_navigation($template, 2);
 
     /* Page content */
-    $page_subtitle = sprintf("Add or remove images for %s", $room_info['address']);
+    $page_subtitle = sprintf("Add or remove images for %s, or select a new thumbnail", $room_info['address']);
     $form_action = '/DDWT18/final/img/';
 
     /* Get error message from POST route */
@@ -719,9 +719,16 @@ elseif (new_route('/DDWT18/final/img/', 'post')) {
             json_encode($error_msg)));
     }
 
+    /* uploading files */
+
     $filearray = reArrayFiles($_FILES['userfile']);
     $room_id = $_POST['room_id'];
     $feedback = upload_imgs($filearray, $room_id);
+
+    if (isset($_POST['imgname'])) {
+        $feedback = remove_img($_POST['room_id'], $_POST['imgname']);
+    }
+
     /* Redirect to img GET route */
 
     redirect(sprintf('/DDWT18/final/img/?room_id=%s',$room_id));
