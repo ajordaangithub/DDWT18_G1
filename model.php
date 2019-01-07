@@ -917,31 +917,6 @@ function get_optin_info($pdo, $roomid, $userid) {
     return $optin_info_exp;
 }
 
-
-
-
-/**
- *Removes user account from the database, and returns feedback message
- *@param PDO $pdo database object
- *@param int $userid ID of the user to be deleted
- *@return array feedback messages
- */
-
-function count_optins($pdo, $userid) {
-    $stmt = $pdo->prepare("SELECT * FROM optins WHERE userid = ?");
-    $stmt->execute([$userid]);
-    $optins = $stmt->rowCount();
-    return $optins;
-}
-
-function count_owned_rooms($pdo, $userid) {
-    $stmt = $pdo->prepare("SELECT * FROM rooms WHERE owner = ?");
-    $stmt->execute([$userid]);
-    $optins = $stmt->rowCount();
-    return $optins;
-}
-
-
 function remove_account($pdo, $userid) {
     session_start();
     session_destroy();
@@ -960,68 +935,3 @@ function remove_account($pdo, $userid) {
         ];
     }
 }
-
-function reArrayFiles($file_post) {
-    $file_ary = array();
-    $file_count = count($file_post['name']);
-    $file_keys = array_keys($file_post);
-
-    for ($i=0; $i<$file_count; $i++) {
-        foreach ($file_keys as $key) {
-            $file_ary[$i][$key] = $file_post[$key][$i];
-        }
-    }
-
-    return $file_ary;
-}
-
-function pre_r($array) {
-    echo '<pre>';
-    print_r($array);
-    echo '</pre>';
-}
-
-function upload_imgs($file_array, $room_id) {
-    $phpFileUploadErrors = array(
-        1 => 'file exceeds maximum php ini filesize',
-        2 => 'file exceeds html form filesize',
-        3 => 'file only partially uploaded',
-        4 => 'no file was uploaded',
-        6 => 'missing temporary folder',
-        7 => 'failed to write file to disk',
-        8 => 'php extension stopped file upload',
-    );
-
-    for ($i=0;$i<count($file_array);$i++) {
-        if ($file_array[$i]['error']){
-            return [
-                'type' => 'warning',
-                'message' => $file_array[$i]['name'] . $phpFileUploadErrors[$file_array[$i]['error']]
-            ];
-        }
-        else {
-            $extensions = array('jpg','png','jpeg');
-            $file_ext = explode('.',$file_array[$i]['name']);
-            $file_ext = end($file_ext);
-
-            if (!in_array($file_ext, $extensions)){
-                return [
-                    'type' => 'warning',
-                    'message' => 'invalid file extension'
-                ];
-            }
-            else {
-                if(!is_dir("images/$room_id")) {
-                    mkdir("images/$room_id");
-                }
-                move_uploaded_file($file_array[$i]['tmp_name'], "images/$room_id/".$file_array[$i]['name']);
-            }
-        }
-
-    }
-    return [
-        'type' => 'succes',
-        'message' => 'files uploaded succesfully'
-    ];
-}
-
