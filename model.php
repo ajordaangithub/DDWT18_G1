@@ -1060,9 +1060,8 @@ function get_images($room_id, $displaybuttons){
         $files = scandir($dir_path, 1);
         for($i = 0; $i < count($files); $i++) {
             if($files[$i] !='.' && $files[$i] !='..') {
-
-                echo "<div class='card' style='margin-right: 10px;'><img src='/DDWT18/final/$dir_path/$files[$i]' alt='img' width='200' height='200'><br>";
                 if ($displaybuttons) {
+                    echo "<div class = 'card' style='margin-right: 10px;'><img src='/DDWT18/final/$dir_path/$files[$i]' alt='img' width='200' height='200'><br>";
                     echo " <form action='/DDWT18/final/img' method='POST'>
                     <input type='hidden' value='$files[$i]' name='imgname'>
                     <input type='hidden' value='thumbnail' name='mode'>
@@ -1075,9 +1074,11 @@ function get_images($room_id, $displaybuttons){
                     <input type='hidden' value='remove' name='mode'>
                     <input type='hidden' value='$room_id' name='room_id'>
                     <button type='submit' class='btn btn-danger'>Remove</button>
-                    
                     </form></div>";
 
+                }
+                else {
+                    echo "<div class='img-thumbnail' style='margin-right: 10px; margin-bottom: 10px;'><img  src='/DDWT18/final/$dir_path/$files[$i]' alt='img' width='200' height='200'></div><br>";
                 }
                 $file = pathinfo($files[$i]);
                 $extension = $file['extension'];

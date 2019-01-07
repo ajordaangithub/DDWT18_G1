@@ -690,7 +690,6 @@ elseif (new_route('/DDWT18/final/img/', 'get')) {
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
-    pre_r($_GET);
 
     /* Choose Template */
     include use_template('img');

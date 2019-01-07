@@ -52,13 +52,16 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="row">
+                <?php get_images($room_id, 0) ?>
+            </div>
             <?php if ($display_buttons) {?>
                 <div class="row">
                     <div class="col-sm-2">
                         <a href="/DDWT18/final/edit/?room_id=<?= $room_id ?>&user_id=<?= $_GET['room_id']?>" role="button" class="btn btn-warning">Edit</a>
                     </div>
                     <div class="col-sm-2">
-                        <a href="/DDWT18/final/img/?room_id=<?= $room_id ?>&user_id=<?= $_GET['room_id']?>" role="button" class="btn btn-warning">Pictures</a>
+                        <a href="/DDWT18/final/img/?room_id=<?= $room_id ?>&user_id=<?= $_GET['room_id']?>" role="button" class="btn btn-warning">Images</a>
                     </div>
                     <div class="col-sm-2">
                         <form action="/DDWT18/final/remove/" method="POST">
@@ -100,7 +103,8 @@
 
         </div>
 
-    </div>
+
+
 </div>
 
 

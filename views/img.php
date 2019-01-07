@@ -34,11 +34,12 @@
 
         <div class="optin">
             <form action="<?= $form_action ?>" method="POST" enctype="multipart/form-data">
-                <input type="file" name="userfile[]" value="" multiple="">
-                <input type="submit" name="submit" value="Upload">
+                <input class="btn btn-light" type="file" name="userfile[]" value="test" multiple="">
+                <input class="btn btn-dark" type="submit" name="submit" value="Upload">
                 <?php if(isset($room_id)){ ?> <input type="hidden" name="room_id" value=" <?php echo $room_id ?>"><?php } ?>
                 <?php if(isset($room_owner)){ ?> <input type="hidden" name="room_owner" value=" <?php echo $room_owner ?>"><?php } ?>
             </form>
+            <br>
         <div class="row">
             <?php get_images($room_id, 1) ?>
         </div>
