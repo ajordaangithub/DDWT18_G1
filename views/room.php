@@ -58,6 +58,9 @@
                         <a href="/DDWT18/final/edit/?room_id=<?= $room_id ?>&user_id=<?= $_GET['room_id']?>" role="button" class="btn btn-warning">Edit</a>
                     </div>
                     <div class="col-sm-2">
+                        <a href="/DDWT18/final/img/?room_id=<?= $room_id ?>&user_id=<?= $_GET['room_id']?>" role="button" class="btn btn-warning">Pictures</a>
+                    </div>
+                    <div class="col-sm-2">
                         <form action="/DDWT18/final/remove/" method="POST">
                             <input type="hidden" value="<?= $room_id ?>" name="room_id">
                             <button type="submit" class="btn btn-danger">Remove</button>
@@ -66,27 +69,27 @@
                 </div>
             <?php }?>
             <?php if ($display_optin) {?>
-            <div class="optin">
-                <h5>Initiate an opt-in</h5>
-                <form action="/DDWT18/final/optin/" method="POST">
-                    <div class="form-group row">
-                        <label for="optinMessage" class="col-sm-2 col-form-label">Message</label>
-                        <div class="col-sm-10">
-                            <textarea class="form-control" id="optinMessage" rows="3" name="Message" required></textarea>
+                <div class="optin">
+                    <h5>Initiate an opt-in</h5>
+                    <form action="/DDWT18/final/optin/" method="POST">
+                        <div class="form-group row">
+                            <label for="optinMessage" class="col-sm-2 col-form-label">Message</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" id="optinMessage" rows="3" name="Message" required></textarea>
+                            </div>
                         </div>
-                    </div>
                         <div class="col-sm-2">
                             <input type="hidden" value="<?= $room_id ?>" name="room_id">
                         </div>
                         <button type="submit" class="btn btn-primary">Opt-in!</button>
-                </form>
-            </div>
-                <?php }?>
-                <?php if($display_optins) {?>
-                    <?php if(isset($left_content)){?>
-                        <h1>Current Opt-ins</h1>
-                        <?php echo $left_content;} ?>
-                <?php }?>
+                    </form>
+                </div>
+            <?php }?>
+            <?php if($display_optins) {?>
+                <?php if(isset($left_content)){?>
+                    <h1>Current Opt-ins</h1>
+                    <?php echo $left_content;} ?>
+            <?php }?>
 
         </div>
 

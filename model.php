@@ -959,3 +959,86 @@ function remove_account($pdo, $userid) {
     }
 }
 
+/**
+ * Reorganises file upload array in a more readable way
+ * @param $file_post post request array with file info
+ * @return array reorganised file array
+ */
+function reArrayFiles($file_post) {
+    $file_ary = array();
+    $file_count = count($file_post['name']);
+    $file_keys = array_keys($file_post);
+
+    for ($i=0; $i<$file_count; $i++) {
+        foreach ($file_keys as $key) {
+            $file_ary[$i][$key] = $file_post[$key][$i];
+        }
+    }
+
+    return $file_ary;
+}
+
+/**
+ * print_r but more readable for testing
+ * @param $array
+ */
+function pre_r($array) {
+    echo '<pre>';
+    print_r($array);
+    echo '</pre>';
+}
+
+/**
+ * PHP image upload function. Takes multiple images from array and uploads them to a folder per room
+ * @param $file_array file array from post request
+ * @param $room_id id of the room of which the images belong to
+ * @return array feedback messages
+ */
+
+function upload_imgs($file_array, $room_id) {
+    $phpFileUploadErrors = array(
+        1 => 'file exceeds maximum php ini filesize',
+        2 => 'file exceeds html form filesize',
+        3 => 'file only partially uploaded',
+        4 => 'no file was uploaded',
+        6 => 'missing temporary folder',
+        7 => 'failed to write file to disk',
+        8 => 'php extension stopped file upload',
+    );
+    if(!is_dir("images/")) {
+        mkdir("images/");
+    }
+
+    for ($i=0;$i<count($file_array);$i++) {
+        if ($file_array[$i]['error']){
+            return [
+                'type' => 'warning',
+                'message' => $file_array[$i]['name'] . $phpFileUploadErrors[$file_array[$i]['error']]
+            ];
+        }
+        else {
+            $extensions = array('jpg','png','jpeg');
+            $file_ext = explode('.',$file_array[$i]['name']);
+            $file_ext = end($file_ext);
+
+            if (!in_array($file_ext, $extensions)){
+                return [
+                    'type' => 'warning',
+                    'message' => 'invalid file extension'
+                ];
+            }
+            else {
+                if(!is_dir("images/$room_id")) {
+                    mkdir("images/$room_id");
+                }
+                move_uploaded_file($file_array[$i]['tmp_name'], "images/$room_id/".$file_array[$i]['name']);
+            }
+        }
+
+    }
+    return [
+        'type' => 'succes',
+        'message' => 'files uploaded succesfully'
+    ];
+}
+
