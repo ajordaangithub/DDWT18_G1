@@ -416,6 +416,7 @@ elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
     /* page content */
     $page_content = '';
     $role = get_userinfo($db, $_SESSION['user_id'])['role'];
+
     if ($role == 2 && count_optins($db, $_SESSION['user_id'])) {
         $page_subtitle = sprintf("View all your submitted opt-ins");
         $display_optins = True;

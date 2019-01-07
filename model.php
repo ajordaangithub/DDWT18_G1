@@ -498,11 +498,20 @@ function remove_room($pdo, $room_id){
     $stmt->execute([$room_id, $room_id]);
     $deleted = $stmt->rowCount();
     if ($deleted ==  1) {
+
+        /*remove all images of room */
+        $dir_path = "images/$room_id";
+        if (is_dir($dir_path)) {
+            array_map('unlink', glob("$dir_path/*.*"));
+            rmdir($dir_path);
+        }
+
         return [
             'type' => 'success',
             'message' => sprintf("Room '%s' was removed!", $room_info['address'])
         ];
     }
+
     else {
         return [
             'type' => 'danger',
@@ -953,9 +962,11 @@ function count_owned_rooms($pdo, $userid) {
 function remove_account($pdo, $userid) {
     session_start();
     session_destroy();
+    remove_account_imgs($pdo, $userid);
     $stmt = $pdo->prepare('DELETE FROM users WHERE id = ?; DELETE FROM optins WHERE userid = ?');
     $stmt->execute([$userid, $userid]);
     $deleted = $stmt->rowCount();
+    $stmt->closeCursor();
     if ($deleted == 1) {
         return [
             'type' => 'success',
@@ -1101,6 +1112,23 @@ function remove_img($room_id, $imgname) {
     ];
 }
 
+function remove_account_imgs($pdo, $userid){
+    $stmt = $pdo->prepare("SELECT id FROM rooms WHERE owner = ?");
+    $stmt->execute([
+        $userid
+    ]);
+    $allrooms = $stmt->fetchAll();
+    for ($i = 0; $i < count($allrooms); $i++) {
+        $nr = $allrooms[$i]["id"];
+        $dir_path = "images/$nr";
+        echo "$dir_path";
+        if (is_dir($dir_path)) {
+            array_map('unlink', glob("$dir_path/*.*"));
+            rmdir($dir_path);
+        }
+    }
+}
+
 function set_thumbnail($room_id, $imgname, $pdo) {
     $stmt = $pdo->prepare("UPDATE rooms SET thumbnail = ? WHERE id = ?");
     $stmt->execute([
@@ -1116,5 +1144,4 @@ function get_thumbnail($room_id, $pdo) {
     $name = $stmt->fetchAll();
     return $name;
 }
-
 
