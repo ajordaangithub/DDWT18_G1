@@ -74,10 +74,6 @@
             <?php if(isset($left_content)){?>
                 <?php if ($role == 2) {?>
                 <h1 id="header">Current Opt-ins</h1>
-                    <form action="/DDWT18/final/removeoptins/" method="POST">
-                        <input type="hidden" value="<?= $_SESSION['user_id'] ?>" name="user_id">
-                        <button type="submit" class="btn btn-danger">Remove All Optins</button>
-                    </form>
                 <?php echo $left_content;} else {?>
                     <h1 id="header">Current submitted rooms</h1>
                     <?php echo $left_content;}?>
