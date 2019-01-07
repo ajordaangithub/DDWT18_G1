@@ -9,7 +9,7 @@
 session_start();
 
 include 'model.php';
-$db = connect_db('localhost:3307', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
+$db = connect_db('localhost:3306', 'ddwt18_finalproject', 'ddwt18', 'ddwt18');
 $nbr_rooms = count_rooms($db);
 $nbr_users = count_users($db);
 $right_column = use_template('cards');
@@ -725,8 +725,11 @@ elseif (new_route('/DDWT18/final/img/', 'post')) {
     $room_id = $_POST['room_id'];
     $feedback = upload_imgs($filearray, $room_id);
 
-    if (isset($_POST['imgname'])) {
+    if (isset($_POST['imgname']) && $_POST['mode'] == 'remove') {
         $feedback = remove_img($_POST['room_id'], $_POST['imgname']);
+    }
+    if (isset($_POST['imgname']) && $_POST['mode'] == 'thumbnail') {
+        $feedback = set_thumbnail($_POST['room_id'], $_POST['imgname'], $db);
     }
 
     /* Redirect to img GET route */

@@ -264,6 +264,7 @@ function get_room_table($series, $pdo, $route){
     $cities = get_cities($pdo);
     $card_exp = '<div class="card-body"><form action="/DDWT18/final/';
     $card_exp .= $route;
+
     $card_exp .= '" method="post">
     <div class="form-group">
       <label for="inputUsername">Order By</label>
@@ -291,8 +292,17 @@ function get_room_table($series, $pdo, $route){
    <button type="submit" class="btn btn-primary">Order/Filter</button></div>
   </form></div>';
     foreach ($series as $key => $value) {
+        $room_id = $value['id'];
+        $th_array = get_thumbnail($room_id, $pdo);
+        $thumbnail = $th_array[0]['thumbnail'];
+            if ($thumbnail == '') {
+                $path = "/DDWT18/final/placeholder.png";
+            }
+            else {
+                $path = "/DDWT18/final/images/$room_id/$thumbnail";
+            }
         $card_exp .= '<div class="card" id="overview-card" style="width: 350px;">
-  <img class="card-img-top" src="../house.jpg" alt="Card image cap" height="350px">
+ <img class="card-img-top" src='.$path.' alt="Card image cap" height="350px">
   <div class="card-body">
     <h5 class="card-title"><i class="fas fa-home"></i> '.$value['address'].', '.$value['city'].'</h5>
     <p class="card-text"><i class="fas fa-user"></i> '.get_username($pdo,$value['owner'])['full_name'].'</p>
@@ -1055,12 +1065,14 @@ function get_images($room_id, $displaybuttons){
                 if ($displaybuttons) {
                     echo " <form action='/DDWT18/final/img' method='POST'>
                     <input type='hidden' value='$files[$i]' name='imgname'>
+                    <input type='hidden' value='thumbnail' name='mode'>
                     <input type='hidden' value='$room_id' name='room_id'>
                     <button type='submit' class='btn btn-warning'>Set as thumbnail</button>
                     </form>";
 
                     echo " <form action='/DDWT18/final/img' method='POST'>
                     <input type='hidden' value='$files[$i]' name='imgname'>
+                    <input type='hidden' value='remove' name='mode'>
                     <input type='hidden' value='$room_id' name='room_id'>
                     <button type='submit' class='btn btn-danger'>Remove</button>
                     
@@ -1088,5 +1100,20 @@ function remove_img($room_id, $imgname) {
     ];
 }
 
+function set_thumbnail($room_id, $imgname, $pdo) {
+    $stmt = $pdo->prepare("UPDATE rooms SET thumbnail = ? WHERE id = ?");
+    $stmt->execute([
+        $imgname,
+        $room_id]);
+}
+
+function get_thumbnail($room_id, $pdo) {
+    $stmt = $pdo->prepare("SELECT thumbnail FROM rooms WHERE id = ?");
+    $stmt->execute([
+        $room_id
+    ]);
+    $name = $stmt->fetchAll();
+    return $name;
+}
 
 
