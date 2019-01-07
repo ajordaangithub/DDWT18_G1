@@ -155,14 +155,25 @@ function count_users($pdo) {
  * @param object $pdo database object
  * @return array Associative array with all series
  */
-function get_rooms_tenant($pdo, $status){
-    $filter = $order = 0;
-    if($status && array_key_exists('status', $status)) {
-        $status = $status['status'];
-        $feedback = json_decode($status, True);
-        $order = $feedback['order'];
-        $filter = $feedback['filter'];
+function get_rooms_tenant($pdo){
+    $stmt = $pdo->prepare('SELECT * FROM rooms');
+    $stmt->execute();
+    $series = $stmt->fetchAll();
+    $series_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($series as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
     }
+    return $series_exp;
+}
+
+function get_rooms_tenant_order($pdo, $status){
+    $feedback = json_decode($status, True);
+    $order = $feedback['order'];
+    $filter = $feedback['filter'];
     $sql = 'SELECT * FROM rooms';
     if ($filter) {
         $sql .= ' WHERE city = "';
@@ -199,14 +210,25 @@ function get_rooms_tenant($pdo, $status){
  * @param object $pdo database object
  * @return array Associative array with all series
  */
-function get_rooms_owner($pdo, $userid, $status){
-    $filter = $order = 0;
-    if($status && array_key_exists('status', $status)) {
-        $status = $status['status'];
-        $feedback = json_decode($status, True);
-        $order = $feedback['order'];
-        $filter = $feedback['filter'];
+function get_rooms_owner($pdo, $userid){
+    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE owner = ?');
+    $stmt->execute([$userid]);
+    $series = $stmt->fetchAll();
+    $series_exp = Array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($series as $key => $value){
+        foreach ($value as $user_key => $user_input) {
+            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
     }
+    return $series_exp;
+}
+
+function get_rooms_owner_order($pdo, $userid, $status){
+    $feedback = json_decode($status, True);
+    $order = $feedback['order'];
+    $filter = $feedback['filter'];
     $sql = 'SELECT * FROM rooms WHERE owner = ?';
     if ($filter) {
         $sql .= ' AND city = "';
@@ -260,11 +282,9 @@ function get_cities($pdo){
  * @param array $series with series from the db
  * @return string
  */
-function get_room_table($series, $pdo, $route){
+function get_room_table($series, $pdo){
     $cities = get_cities($pdo);
-    $card_exp = '<div class="card-body"><form action="/DDWT18/final/';
-    $card_exp .= $route;
-    $card_exp .= '" method="post">
+    $card_exp = '<div class="card-body"><form action="/DDWT18/final/overview/" method="post">
     <div class="form-group">
       <label for="inputUsername">Order By</label>
       <select name="order" class="form-control" id="inputUsername">
@@ -321,11 +341,6 @@ function add_room($pdo, $room_info, $user_id){
             'type' => 'danger',
             'message' => 'Address field empty. Room not added.'
         ];
-    } elseif (empty($room_info['City'])){
-        return [
-            'type' => 'danger',
-            'message' => 'City field empty. Room not added.'
-        ];
     } elseif (empty($room_info['Type'])){
         return [
             'type' => 'danger',
@@ -358,10 +373,9 @@ function add_room($pdo, $room_info, $user_id){
 
     /* Add room */
     else {
-        $stmt = $pdo->prepare("INSERT INTO rooms (address, city, type, price, size, owner) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO rooms (address, type, price, size, owner) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([
             $room_info['Address'],
-            $room_info['City'],
             $room_info['Type'],
             $room_info['Price'],
             $room_info['Size'],
@@ -392,11 +406,6 @@ function update_room($pdo, $room_info, $user_id) {
         return [
             'type' => 'danger',
             'message' => 'Address field empty. Room not updated.'
-        ];
-    } elseif (empty($room_info['City'])){
-        return [
-            'type' => 'danger',
-            'message' => 'City field empty. Room not updated.'
         ];
     } elseif (empty($room_info['Type'])){
         return [
@@ -443,10 +452,9 @@ function update_room($pdo, $room_info, $user_id) {
 
     /* Update room */
     else {
-        $stmt = $pdo->prepare("UPDATE rooms SET address = ?, city = ?, type = ?, price = ?, size = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE rooms SET address = ?, type = ?, price = ?, size = ? WHERE id = ?");
         $stmt->execute([
             $room_info['Address'],
-            $room_info['City'],
             $room_info['Type'],
             $room_info['Price'],
             $room_info['Size'],
@@ -890,23 +898,6 @@ function remove_optin($pdo, $roomid, $userid) {
     }
 }
 
-function remove_optins($pdo, $userid) {
-    $stmt = $pdo->prepare('DELETE FROM optins WHERE userid = ?');
-    $stmt->execute([$userid]);
-    $deleted = $stmt->rowCount();
-    if ($deleted == 1) {
-        return [
-            'type' => 'success',
-            'message' => 'Opt-ins were successfully deleted.'
-        ];
-    } else {
-        return [
-            'type' => 'warning',
-            'message' => 'An error occurred. The optins were not removed.'
-        ];
-    }
-}
-
 /**
  * Creats a Bootstrap table with a list of series
  * @param PDO $pdo database object
@@ -926,6 +917,16 @@ function get_optin_info($pdo, $roomid, $userid) {
     return $optin_info_exp;
 }
 
+
+
+
+/**
+ *Removes user account from the database, and returns feedback message
+ *@param PDO $pdo database object
+ *@param int $userid ID of the user to be deleted
+ *@return array feedback messages
+ */
+
 function count_optins($pdo, $userid) {
     $stmt = $pdo->prepare("SELECT * FROM optins WHERE userid = ?");
     $stmt->execute([$userid]);
@@ -939,6 +940,7 @@ function count_owned_rooms($pdo, $userid) {
     $optins = $stmt->rowCount();
     return $optins;
 }
+
 
 function remove_account($pdo, $userid) {
     session_start();
@@ -957,5 +959,69 @@ function remove_account($pdo, $userid) {
             'message' => 'An error occurred. Your account was not removed.'
         ];
     }
+}
+
+function reArrayFiles($file_post) {
+    $file_ary = array();
+    $file_count = count($file_post['name']);
+    $file_keys = array_keys($file_post);
+
+    for ($i=0; $i<$file_count; $i++) {
+        foreach ($file_keys as $key) {
+            $file_ary[$i][$key] = $file_post[$key][$i];
+        }
+    }
+
+    return $file_ary;
+}
+
+function pre_r($array) {
+    echo '<pre>';
+    print_r($array);
+    echo '</pre>';
+}
+
+function upload_imgs($file_array, $room_id) {
+    $phpFileUploadErrors = array(
+        1 => 'file exceeds maximum php ini filesize',
+        2 => 'file exceeds html form filesize',
+        3 => 'file only partially uploaded',
+        4 => 'no file was uploaded',
+        6 => 'missing temporary folder',
+        7 => 'failed to write file to disk',
+        8 => 'php extension stopped file upload',
+    );
+
+    for ($i=0;$i<count($file_array);$i++) {
+        if ($file_array[$i]['error']){
+            return [
+                'type' => 'warning',
+                'message' => $file_array[$i]['name'] . $phpFileUploadErrors[$file_array[$i]['error']]
+            ];
+        }
+        else {
+            $extensions = array('jpg','png','jpeg');
+            $file_ext = explode('.',$file_array[$i]['name']);
+            $file_ext = end($file_ext);
+
+            if (!in_array($file_ext, $extensions)){
+                return [
+                    'type' => 'warning',
+                    'message' => 'invalid file extension'
+                ];
+            }
+            else {
+                if(!is_dir("images/$room_id")) {
+                    mkdir("images/$room_id");
+                }
+                move_uploaded_file($file_array[$i]['tmp_name'], "images/$room_id/".$file_array[$i]['name']);
+            }
+        }
+
+    }
+    return [
+        'type' => 'succes',
+        'message' => 'files uploaded succesfully'
+    ];
 }
 
