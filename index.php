@@ -358,8 +358,7 @@ elseif (new_route('/DDWT18/final/edit/', 'post')) {
     $feedback = update_room($db, $_POST, $_SESSION['user_id']);
 
     /* Redirect to room GET route */
-    redirect(sprintf('/DDWT18/final/room/?room_id='.$room_id.'?error_msg=%s', json_encode($feedback)));
-    /* TODO: show error msg after updating */
+    redirect(sprintf('/DDWT18/final/room/?room_id='.$room_id.'&error_msg=%s', json_encode($feedback)));
 }
 
 /* Delete room POST */
