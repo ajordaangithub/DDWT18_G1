@@ -42,6 +42,13 @@
                     </div>
                 </div>
                 <div class="form-group row">
+                    <label for="inputCity" class="col-sm-2 col-form-label">City</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputCity" name="City"
+                               value="<?php if (isset($room_info)){echo $room_info['city'];} ?>" required>
+                    </div>
+                </div>
+                <div class="form-group row">
                     <label for="inputType" class="col-sm-2 col-form-label">Type</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="inputType" name="Type"
