@@ -295,7 +295,7 @@ function get_room_table($series, $pdo, $route){
         $room_id = $value['id'];
         $th_array = get_thumbnail($room_id, $pdo);
         $thumbnail = $th_array[0]['thumbnail'];
-            if ($thumbnail == '') {
+            if ($thumbnail == '' || !file_exists("images/$room_id/$thumbnail") ) {
                 $path = "/DDWT18/final/placeholder.png";
             }
             else {
@@ -959,6 +959,13 @@ function count_owned_rooms($pdo, $userid) {
     return $optins;
 }
 
+
+/** Completely removes user account from the db. Also clears all imgs and ends the session.
+ * @param $pdo database object
+ * @param $userid id of the user to be removed
+ * @return array feedback messages
+ */
+
 function remove_account($pdo, $userid) {
     session_start();
     session_destroy();
@@ -1064,6 +1071,12 @@ function upload_imgs($file_array, $room_id) {
     ];
 }
 
+/**
+ * retrieves all images of a room from a directory on the server
+ * @param $room_id id of the room of which to retrieve imgs
+ * @param $displaybuttons boolean that sets whether images can be removed/set as thumbnail
+ * @return images and buttons with divs in html
+ */
 function get_images($room_id, $displaybuttons){
     $dir_path = "images/$room_id";
 
@@ -1102,6 +1115,12 @@ function get_images($room_id, $displaybuttons){
 
 }
 
+/**
+ * removes an image from the server
+ * @param $room_id id of the room the image belongs to
+ * @param $imgname image filename
+ * @return array feedback messages
+ */
 function remove_img($room_id, $imgname) {
     $room_id = trim($room_id);
     $dir_path = "images/$room_id/$imgname";
@@ -1112,6 +1131,11 @@ function remove_img($room_id, $imgname) {
     ];
 }
 
+/**
+ * Remove all images of all rooms associated with an account
+ * @param $pdo pdo database object
+ * @param $userid id of the user of which to remove imgs
+ */
 function remove_account_imgs($pdo, $userid){
     $stmt = $pdo->prepare("SELECT id FROM rooms WHERE owner = ?");
     $stmt->execute([
@@ -1121,13 +1145,19 @@ function remove_account_imgs($pdo, $userid){
     for ($i = 0; $i < count($allrooms); $i++) {
         $nr = $allrooms[$i]["id"];
         $dir_path = "images/$nr";
-        echo "$dir_path";
         if (is_dir($dir_path)) {
             array_map('unlink', glob("$dir_path/*.*"));
             rmdir($dir_path);
         }
     }
 }
+
+/**
+ * selects an image as the thumbnail for in the overview
+ * @param $room_id id of the room the img belongs to
+ * @param $imgname filename of the image
+ * @param $pdo database object
+ */
 
 function set_thumbnail($room_id, $imgname, $pdo) {
     $stmt = $pdo->prepare("UPDATE rooms SET thumbnail = ? WHERE id = ?");
@@ -1136,6 +1166,12 @@ function set_thumbnail($room_id, $imgname, $pdo) {
         $room_id]);
 }
 
+/**
+ * function that retrieves the filename of the thumbnail of a room from the database
+ * @param $room_id id of the room of which to get the thumbnail
+ * @param $pdo database object
+ * @return array with the filenamme
+ */
 function get_thumbnail($room_id, $pdo) {
     $stmt = $pdo->prepare("SELECT thumbnail FROM rooms WHERE id = ?");
     $stmt->execute([
