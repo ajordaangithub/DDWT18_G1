@@ -302,9 +302,10 @@ function get_room_table($series, $pdo, $route){
                 $path = "/DDWT18/final/images/$room_id/$thumbnail";
             }
         $card_exp .= '<div class="card" id="overview-card" style="width: 350px;">
- <img class="card-img-top" src='.$path.' alt="Card image cap" height="350px">
+ <img class="card-img-top" src='.$path.' alt="Card image cap" style="height: 350px">
   <div class="card-body">
-    <h5 class="card-title"><i class="fas fa-home"></i> '.$value['address'].', '.$value['city'].'</h5>
+    <h5 class="card-title"><i class="fas fa-home"></i> '.$value['address'].'</h5>
+    <p class="card-text"><i class="fas fa-city"></i> '.$value['city'].'</p>
     <p class="card-text"><i class="fas fa-user"></i> '.get_username($pdo,$value['owner'])['full_name'].'</p>
     <p class="card-text"><i class="fas fa-euro-sign"></i> '.$value['price'].'</p>
     <p class="card-text"><i class="fas fa-chair"></i> '.$value['size'].' m2</p>
