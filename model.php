@@ -126,9 +126,9 @@ function get_navigation($navigation_tpl, $active_id){
 }
 
 /**
- * Count the number of series listed on Series Overview
+ * Count the number of rooms listed on Website
  * @param object $pdo database object
- * @return mixed
+ * @return number of rooms
  */
 function count_rooms($pdo){
     /* Get series */
@@ -141,7 +141,7 @@ function count_rooms($pdo){
 /**
  * Count the current number of users in the database
  * @param PDO $pdo database object
- * @return mixed
+ * @return number of users
  */
 function count_users($pdo) {
     $stmt = $pdo->prepare("SELECT * FROM users");
@@ -151,9 +151,10 @@ function count_users($pdo) {
 }
 
 /**
- * Get array with all listed series from the database
+ * Get array with all listed rooms from the database special for students (filtered and orderd)
  * @param object $pdo database object
- * @return array Associative array with all series
+ * @param object $status GET object
+ * @return array Associative array with all rooms
  */
 function get_rooms_tenant($pdo, $status){
     $filter = $order = 0;
@@ -195,9 +196,11 @@ function get_rooms_tenant($pdo, $status){
     return $series_exp;
 }
 /**
- * Get array with all listed series from the database
+ * Get array with all listed rooms of the owners from the database
  * @param object $pdo database object
- * @return array Associative array with all series
+ * @param object $userid $session userid
+ * @param object $status GET object
+ * @return array Associative array with all rooms
  */
 function get_rooms_owner($pdo, $userid, $status){
     $filter = $order = 0;
@@ -238,7 +241,11 @@ function get_rooms_owner($pdo, $userid, $status){
     }
     return $series_exp;
 }
-
+/**
+ * Get array with all listed cities in which rooms of the database appear
+ * @param object $pdo database object
+ * @return array Associative array with all cities
+ */
 function get_cities($pdo){
     $stmt = $pdo->prepare('SELECT DISTINCT city FROM rooms');
     $stmt->execute();
@@ -534,6 +541,7 @@ function p_print($input){
 /**
  * Get the full name of a user corresponding with a specific id
  * @param PDO $pdo database object
+ * @param PDO $user_id database object
  * @return mixed
  */
 function get_username($pdo, $user_id) {
@@ -581,8 +589,9 @@ function get_userinfo($pdo, $user_id){
 }
 
 /**
- * Count the current number of users in the database
+ * Register the user
  * @param PDO $pdo database object
+ * @param PDO $form_data all data given by user.
  * @return mixed
  */
 function register_user($pdo, $form_data){
@@ -643,6 +652,12 @@ created!', (get_username($pdo, $_SESSION['user_id'])['full_name']))
         json_encode($feedback)));
 }
 
+/**
+ * Creats HTML alert code with information about the success or failure
+ * @param bool $type True if success, False if failure
+ * @param string $message Error/Success message
+ * @return string
+ */
 function get_error($feedback){
     $feedback = json_decode($feedback, True);
     $error_exp = '
@@ -652,14 +667,20 @@ function get_error($feedback){
     return $error_exp;
 }
 
+
+/**
+ * Changes the HTTP Header to a given location
+ * @param string $location location to be redirected to
+ */
 function redirect($location){
     header(sprintf('Location: %s', $location));
     die();
 }
 
 /**
- * Count the current number of users in the database
+ * Log user in
  * @param PDO $pdo database object
+ * @param PDO $form_data pw and username
  * @return mixed
  */
 function login_user($pdo, $form_data) {
@@ -724,8 +745,10 @@ function logout_user($pdo) {
 }
 
 /**
- * Count the current number of users in the database
+ * Check if user has any optins on room
  * @param PDO $pdo database object
+ * @param PDO $userid database object
+ * @param PDO $roomid database object
  * @return mixed
  */
 function check_optins($pdo, $userid, $roomid) {
@@ -743,8 +766,10 @@ function check_optins($pdo, $userid, $roomid) {
 }
 
 /**
- * Count the current number of users in the database
+ * Add optin to database
  * @param PDO $pdo database object
+ * @param PDO $userid database object
+ * @param PDO $roomid database object
  * @return mixed
  */
 function add_optin($pdo, $form_data, $userid) {
@@ -772,9 +797,10 @@ function add_optin($pdo, $form_data, $userid) {
 }
 
 /**
- * Get array with all listed series from the database
+ * Get array with all optins of a certain room
  * @param object $pdo database object
- * @return array Associative array with all series
+ * @param object $roomid database object
+ * @return array Associative array with all rooms
  */
 function get_optins_owner($pdo, $roomid){
     $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ?');
@@ -792,9 +818,10 @@ function get_optins_owner($pdo, $roomid){
 }
 
 /**
- * Get array with all listed series from the database
+ * Get array with all optins of a user
  * @param object $pdo database object
- * @return array Associative array with all series
+ * @param object $userid database object
+ * @return array Associative array with all optins
  */
 function get_alloptins_tenant($pdo, $userid){
     $stmt = $pdo->prepare('SELECT * FROM optins WHERE userid = ?');
@@ -812,9 +839,11 @@ function get_alloptins_tenant($pdo, $userid){
 }
 
 /**
- * Get array with all listed series from the database
+ * Get array with all optins from user on rooms
  * @param object $pdo database object
- * @return array Associative array with all series
+ * @param PDO $userid database object
+ * @param PDO $roomid database object
+ * @return array Associative array with all optins
  */
 function get_optins_tenant($pdo, $roomid, $userid){
     $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ? AND userid = ?');
@@ -832,9 +861,9 @@ function get_optins_tenant($pdo, $roomid, $userid){
 }
 
 /**
- * Creats a Bootstrap table with a list of series
+ * Creats a Bootstrap table with a list of optins
  * @param PDO $pdo database object
- * @param array $series with series from the db
+ * @param array $optins with optins from the db
  * @return string
  */
 function get_optin_table_owner($optins, $pdo){
@@ -859,9 +888,9 @@ function get_optin_table_owner($optins, $pdo){
 }
 
 /**
- * Creats a Bootstrap table with a list of series
+ * Creats a Bootstrap table with a list of optins
  * @param PDO $pdo database object
- * @param array $series with series from the db
+ * @param array $optins with optins from the db
  * @return string
  */
 function get_optin_table_tenant($optins, $pdo){
@@ -888,9 +917,10 @@ function get_optin_table_tenant($optins, $pdo){
 }
 
 /**
- * Creats a Bootstrap table with a list of series
+ * Remove an optin
  * @param PDO $pdo database object
- * @param array $series with series from the db
+ * @param array $userid user
+ * @param PDO $roomid room
  * @return array
  */
 function remove_optin($pdo, $roomid, $userid) {
@@ -910,6 +940,13 @@ function remove_optin($pdo, $roomid, $userid) {
     }
 }
 
+/**
+ * Remove all optins of user
+ * @param PDO $pdo database object
+ * @param array $userid user
+ * @return array
+ */
+
 function remove_optins($pdo, $userid) {
     $stmt = $pdo->prepare('DELETE FROM optins WHERE userid = ?');
     $stmt->execute([$userid]);
@@ -928,9 +965,10 @@ function remove_optins($pdo, $userid) {
 }
 
 /**
- * Creats a Bootstrap table with a list of series
+ * Get info of an optin
  * @param PDO $pdo database object
- * @param array $series with series from the db
+ * @param array $userid user
+ * @param PDO $roomid room
  * @return array
  */
 function get_optin_info($pdo, $roomid, $userid) {
@@ -946,12 +984,26 @@ function get_optin_info($pdo, $roomid, $userid) {
     return $optin_info_exp;
 }
 
+/**
+ * Count all optins
+ * @param PDO $pdo database object
+ * @param array $userid user
+ * @return number
+ */
+
 function count_optins($pdo, $userid) {
     $stmt = $pdo->prepare("SELECT * FROM optins WHERE userid = ?");
     $stmt->execute([$userid]);
     $optins = $stmt->rowCount();
     return $optins;
 }
+
+/**
+ * Count all rooms
+ * @param PDO $pdo database object
+ * @param array $userid user
+ * @return number
+ */
 
 function count_owned_rooms($pdo, $userid) {
     $stmt = $pdo->prepare("SELECT * FROM rooms WHERE owner = ?");
