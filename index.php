@@ -1,9 +1,6 @@
 <?php
 /**
  * Controller
- * User: reinardvandalen
- * Date: 05-11-18
- * Time: 15:25
  */
 
 session_start();
