@@ -69,15 +69,7 @@
                                value="<?php if (isset($room_info)){echo $room_info['size'];} ?>" required>
                     </div>
                 </div>
-                <!-- ToDo: uncomment when abstract implented in DB
-                <div class="form-group row">
-                    <label for="inputAbstract" class="col-sm-2 col-form-label">Abstract</label>
-                    <div class="col-sm-10">
-                        <textarea class="form-control" id="inputAbstract" rows="3" name="Abstract" required>
-                        <?php // if (isset($room_info)){echo $room_info['abstract'];} ?></textarea>
-                    </div>
-                </div> -->
-                
+
                 <?php if(isset($room_id)){ ?> <input type="hidden" name="room_id" value=" <?php echo $room_id ?>"><?php } ?>
                 <?php if(isset($room_owner)){ ?> <input type="hidden" name="room_owner" value=" <?php echo $room_owner ?>"><?php } ?>
                 
