@@ -144,17 +144,22 @@ elseif (new_route('/DDWT18/final/room/', 'get')) {
     }
 
     $optins = check_optins($db, $current_user, $room_id);
-    if ($optins)
+    if ($optins) {
         if ($userinfo['role'] == 1) {
             $display_optin = False;
         } else {
             $display_optin = True;
-            $display_optins = True;
-            $left_content = get_optin_table_tenant(get_optins_tenant($db, $room_id, $current_user), $db);
+            $display_optins = False;
+        }
     } else {
         $display_optin = False;
         $display_optins = True;
         $left_content = get_optin_table_tenant(get_optins_tenant($db, $room_id, $current_user), $db);
+    }
+
+    $optinsroom = check_optins_room($db, $room_id);
+    if($optinsroom && $userinfo['role'] == 1) {
+        $display_optins = False;
     }
 
 

@@ -857,6 +857,17 @@ function check_optins($pdo, $userid, $roomid) {
     }
 }
 
+function check_optins_room($pdo, $roomid) {
+    $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ?');
+    $stmt->execute([$roomid]);
+    $affected = $stmt->rowCount();
+    if ($affected == 0) {
+        return True;
+    } else {
+        return False;
+    }
+}
+
 /**
  * Add optin to database
  * @param PDO $pdo database object
