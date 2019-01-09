@@ -40,7 +40,6 @@ function connect_db($host, $db, $user, $pass){
  * @param string $route_uri URI to be matched
  * @param string $request_type request method
  * @return bool
- *
  */
 function new_route($route_uri, $request_type){
     $route_uri_expl = array_filter(explode('/', $route_uri));
@@ -94,7 +93,7 @@ function get_breadcrumbs($breadcrumbs) {
 
 /**
  * Creates navigation HTML code using given array
- * @param array $navigation Array with as Key the page name and as Value the corresponding url
+ * @param array $navigation_tpl Array with as Key the page name and as Value the corresponding url
  * @return string html code that represents the navigation
  */
 function get_navigation($navigation_tpl, $active_id){
@@ -195,6 +194,7 @@ function get_rooms_tenant($pdo, $status){
     }
     return $series_exp;
 }
+
 /**
  * Get array with all listed rooms of the owners from the database
  * @param object $pdo database object
@@ -329,10 +329,9 @@ function get_room_table($series, $pdo, $route){
  * @param object $pdo db object
  * @param array $room_info post array
  * @param int $user_id user id
- * @return array with feedback message
+ * @return array Feedback message
  */
 function add_room($pdo, $room_info, $user_id){
-    //ToDo: check if user has role owner
     /* Check if fields are correctly set */
     if (empty($room_info['Address'])){
         return [
@@ -487,7 +486,7 @@ function update_room($pdo, $room_info, $user_id) {
  * Removes a room with a specific room-ID and its corresponding opt-ins
  * @param object $pdo db object
  * @param int $room_id id of the to be deleted series
- * @return array
+ * @return array Feedback message
  */
 function remove_room($pdo, $room_id){
     /* Get room info */
@@ -542,7 +541,7 @@ function p_print($input){
  * Get the full name of a user corresponding with a specific id
  * @param PDO $pdo database object
  * @param PDO $user_id database object
- * @return mixed
+ * @return string Username
  */
 function get_username($pdo, $user_id) {
     $stmt = $pdo->prepare("SELECT full_name FROM users WHERE id=?");
@@ -555,7 +554,7 @@ function get_username($pdo, $user_id) {
  * Generates an array with room information
  * @param object $pdo db object
  * @param int $room_id id from the room
- * @return mixed
+ * @return array room info
  */
 function get_roominfo($pdo, $room_id){
     $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
@@ -573,7 +572,8 @@ function get_roominfo($pdo, $room_id){
 /**
  * Count the current number of users in the database
  * @param PDO $pdo database object
- * @return mixed
+ * @param int $user_id user id
+ * @return array user info
  */
 function get_userinfo($pdo, $user_id){
     $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
@@ -592,7 +592,7 @@ function get_userinfo($pdo, $user_id){
  * Register the user
  * @param PDO $pdo database object
  * @param PDO $form_data all data given by user.
- * @return mixed
+ * @return array Feedback message
  */
 function register_user($pdo, $form_data){
     /* Check if all fields are set */
@@ -640,6 +640,7 @@ birth_date, role, biography, profession, language, email, phonenumber) VALUES (?
             'message' => sprintf('There was an error: %s', $e->getMessage())
         ];
     }
+
     /* Login user and redirect */
     session_start();
     $_SESSION['user_id'] = $user_id;
@@ -655,7 +656,8 @@ created!', (get_username($pdo, $_SESSION['user_id'])['full_name']))
 /**
  * Updates a room already in the database
  * @param object $pdo db object
- * @param array $room_info POST array
+ * @param array $user_info POST array
+ * @param int $user_id user id
  * @return array Feedback message
  */
 function update_user($pdo, $user_info, $user_id) {
@@ -745,10 +747,9 @@ function update_user($pdo, $user_info, $user_id) {
 }
 
 /**
- * Creats HTML alert code with information about the success or failure
- * @param bool $type True if success, False if failure
- * @param string $message Error/Success message
- * @return string
+ * Creates HTML alert code with information about the success or failure
+ * @param array $feedback Feedback type and message
+ * @return string Error message in html
  */
 function get_error($feedback){
     $feedback = json_decode($feedback, True);
@@ -773,7 +774,7 @@ function redirect($location){
  * Log user in
  * @param PDO $pdo database object
  * @param PDO $form_data pw and username
- * @return mixed
+ * @return array Feedback message
  */
 function login_user($pdo, $form_data) {
     if (
@@ -810,6 +811,10 @@ function login_user($pdo, $form_data) {
     }
 }
 
+/**
+ * Check if user is logged in
+ * @return bool True if logged in, else False
+ */
 function check_login(){
     if (isset($_SESSION['user_id'])){
         return True;
@@ -818,6 +823,10 @@ function check_login(){
     }
 }
 
+/**
+ * Get user id from session
+ * @return mixed User id if available, else False
+ */
 function get_user_id(){
     if (isset($_SESSION['user_id'])){
         return $_SESSION['user_id'];
@@ -826,12 +835,17 @@ function get_user_id(){
     }
 }
 
+/**
+ * Log the user out
+ * @param PDO $pdo Database object
+ * @return array Feedback message
+ */
 function logout_user($pdo) {
     session_start();
     session_destroy();
     $feedback = [
         'type' => 'success',
-        'message' => sprintf('%s, you have been succesfully logged out!', (get_username($pdo, $_SESSION['user_id'])['full_name']))
+        'message' => sprintf('%s, you have been successfully logged out!', (get_username($pdo, $_SESSION['user_id'])['full_name']))
     ];
     return $feedback;
 }
@@ -841,7 +855,7 @@ function logout_user($pdo) {
  * @param PDO $pdo database object
  * @param PDO $userid database object
  * @param PDO $roomid database object
- * @return mixed
+ * @return bool True if optins available, else False
  */
 function check_optins($pdo, $userid, $roomid) {
     if ( !check_login() ) {
@@ -857,6 +871,12 @@ function check_optins($pdo, $userid, $roomid) {
     }
 }
 
+/**
+ * Check all optins for a room
+ * @param PDO $pdo Database object
+ * @param int $roomid Room id
+ * @return bool True if optins available, else False
+ */
 function check_optins_room($pdo, $roomid) {
     $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ?');
     $stmt->execute([$roomid]);
@@ -871,8 +891,8 @@ function check_optins_room($pdo, $roomid) {
 /**
  * Add optin to database
  * @param PDO $pdo database object
- * @param PDO $userid database object
- * @param PDO $roomid database object
+ * @param array $form_data Optin data
+ * @param int $userid user id
  * @return mixed
  */
 function add_optin($pdo, $form_data, $userid) {
@@ -882,7 +902,6 @@ function add_optin($pdo, $form_data, $userid) {
             'message' => 'No message was given. The opt-in was not added'
         ];
     }
-
     else {
         $stmt = $pdo->prepare('INSERT INTO optins (roomid, userid, date, message) VALUES (?,?,?,?)');
         $stmt->execute([$form_data['room_id'], $userid, date('D M Y'), $form_data['Message']]);
@@ -964,10 +983,10 @@ function get_optins_tenant($pdo, $roomid, $userid){
 }
 
 /**
- * Creats a Bootstrap table with a list of optins
+ * Creates a Bootstrap table with a list of optins
  * @param PDO $pdo database object
  * @param array $optins with optins from the db
- * @return string
+ * @return string HTML code for Bootstrap table
  */
 function get_optin_table_owner($optins, $pdo){
     $card_exp = '<div class="card-body"> </div>';
@@ -991,10 +1010,10 @@ function get_optin_table_owner($optins, $pdo){
 }
 
 /**
- * Creats a Bootstrap table with a list of optins
+ * Creates a Bootstrap table with a list of optins
  * @param PDO $pdo database object
  * @param array $optins with optins from the db
- * @return string
+ * @return string HTML code for Bootstrap table
  */
 function get_optin_table_tenant($optins, $pdo){
     $card_exp = '<div class="card-body"> </div>';
@@ -1023,8 +1042,8 @@ function get_optin_table_tenant($optins, $pdo){
  * Remove an optin
  * @param PDO $pdo database object
  * @param array $userid user
- * @param PDO $roomid room
- * @return array
+ * @param int $roomid room
+ * @return array Feedback message
  */
 function remove_optin($pdo, $roomid, $userid) {
     $stmt = $pdo->prepare('DELETE FROM optins WHERE roomid = ? AND userid = ?');
@@ -1047,9 +1066,8 @@ function remove_optin($pdo, $roomid, $userid) {
  * Remove all optins of user
  * @param PDO $pdo database object
  * @param array $userid user
- * @return array
+ * @return array Feedback message
  */
-
 function remove_optins($pdo, $userid) {
     $stmt = $pdo->prepare('DELETE FROM optins WHERE userid = ?');
     $stmt->execute([$userid]);
@@ -1072,7 +1090,7 @@ function remove_optins($pdo, $userid) {
  * @param PDO $pdo database object
  * @param array $userid user
  * @param PDO $roomid room
- * @return array
+ * @return array Feedback message
  */
 function get_optin_info($pdo, $roomid, $userid) {
     $stmt = $pdo->prepare('SELECT * FROM optins WHERE roomid = ? AND userid = ?');
@@ -1088,12 +1106,11 @@ function get_optin_info($pdo, $roomid, $userid) {
 }
 
 /**
- * Count all optins
+ * Count all optins of a user
  * @param PDO $pdo database object
  * @param array $userid user
- * @return number
+ * @return int Number of optins of user
  */
-
 function count_optins($pdo, $userid) {
     $stmt = $pdo->prepare("SELECT * FROM optins WHERE userid = ?");
     $stmt->execute([$userid]);
@@ -1102,12 +1119,11 @@ function count_optins($pdo, $userid) {
 }
 
 /**
- * Count all rooms
+ * Count all rooms of an owner
  * @param PDO $pdo database object
  * @param array $userid user
- * @return number
+ * @return int Number of rooms of user
  */
-
 function count_owned_rooms($pdo, $userid) {
     $stmt = $pdo->prepare("SELECT * FROM rooms WHERE owner = ?");
     $stmt->execute([$userid]);
@@ -1117,11 +1133,10 @@ function count_owned_rooms($pdo, $userid) {
 
 
 /** Completely removes user account from the db. Also clears all imgs and ends the session.
- * @param $pdo database object
- * @param $userid id of the user to be removed
+ * @param PDO $pdo database object
+ * @param int $userid id of the user to be removed
  * @return array feedback messages
  */
-
 function remove_account($pdo, $userid) {
     session_start();
     session_destroy();
@@ -1145,7 +1160,7 @@ function remove_account($pdo, $userid) {
 
 /**
  * Reorganises file upload array in a more readable way
- * @param $file_post post request array with file info
+ * @param array $file_post post request array with file info
  * @return array reorganised file array
  */
 function reArrayFiles($file_post) {
@@ -1178,7 +1193,6 @@ function pre_r($array) {
  * @param $room_id id of the room of which the images belong to
  * @return array feedback messages
  */
-
 function upload_imgs($file_array, $room_id) {
     $room_id = trim($room_id);
     $phpFileUploadErrors = array(
@@ -1229,9 +1243,9 @@ function upload_imgs($file_array, $room_id) {
 
 /**
  * retrieves all images of a room from a directory on the server
- * @param $room_id id of the room of which to retrieve imgs
- * @param $displaybuttons boolean that sets whether images can be removed/set as thumbnail
- * @return images and buttons with divs in html
+ * @param int $room_id id of the room of which to retrieve imgs
+ * @param bool $displaybuttons boolean that sets whether images can be removed/set as thumbnail
+ * @return string images and buttons with divs in html
  */
 function get_images($room_id, $displaybuttons){
     $dir_path = "images/$room_id";
@@ -1273,9 +1287,9 @@ function get_images($room_id, $displaybuttons){
 
 /**
  * removes an image from the server
- * @param $room_id id of the room the image belongs to
- * @param $imgname image filename
- * @return array feedback messages
+ * @param int $room_id id of the room the image belongs to
+ * @param string $imgname image filename
+ * @return array Feedback messages
  */
 function remove_img($room_id, $imgname) {
     $room_id = trim($room_id);
@@ -1289,8 +1303,8 @@ function remove_img($room_id, $imgname) {
 
 /**
  * Remove all images of all rooms associated with an account
- * @param $pdo pdo database object
- * @param $userid id of the user of which to remove imgs
+ * @param PDO $pdo pdo database object
+ * @param int $userid id of the user of which to remove imgs
  */
 function remove_account_imgs($pdo, $userid){
     $stmt = $pdo->prepare("SELECT id FROM rooms WHERE owner = ?");
@@ -1309,12 +1323,11 @@ function remove_account_imgs($pdo, $userid){
 }
 
 /**
- * selects an image as the thumbnail for in the overview
- * @param $room_id id of the room the img belongs to
- * @param $imgname filename of the image
- * @param $pdo database object
+ * Selects an image as the thumbnail for in the overview
+ * @param int $room_id id of the room the img belongs to
+ * @param string $imgname filename of the image
+ * @param PDO $pdo database object
  */
-
 function set_thumbnail($room_id, $imgname, $pdo) {
     $stmt = $pdo->prepare("UPDATE rooms SET thumbnail = ? WHERE id = ?");
     $stmt->execute([
@@ -1324,9 +1337,9 @@ function set_thumbnail($room_id, $imgname, $pdo) {
 
 /**
  * function that retrieves the filename of the thumbnail of a room from the database
- * @param $room_id id of the room of which to get the thumbnail
- * @param $pdo database object
- * @return array with the filenamme
+ * @param int $room_id id of the room of which to get the thumbnail
+ * @param PDO $pdo database object
+ * @return array Array with the filenamme
  */
 function get_thumbnail($room_id, $pdo) {
     $stmt = $pdo->prepare("SELECT thumbnail FROM rooms WHERE id = ?");
@@ -1336,4 +1349,3 @@ function get_thumbnail($room_id, $pdo) {
     $name = $stmt->fetchAll();
     return $name;
 }
-

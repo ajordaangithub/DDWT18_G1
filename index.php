@@ -419,7 +419,7 @@ elseif (new_route('/DDWT18/final/remove/', 'post')) {
     /* Remove room from database */
     $feedback = remove_room($db, $room_id);
 
-    /* Redirect to serie GET route */
+    /* Redirect to overview GET route */
     redirect(sprintf('/DDWT18/final/overview/?error_msg=%s', json_encode($feedback)));
 }
 
