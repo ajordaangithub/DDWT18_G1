@@ -36,6 +36,26 @@
 
     </div>
 
+    <div class="pd-15">
+        <div class="card">
+            <div class="card-header">
+                Your personal information
+            </div>
+            <div class="card-body">
+                <img class="account_image" src="/DDWT18/final/placeholder.png" alt="profile picture">
+                <p class="left"><b>Username:</b> <?= $username?></p>
+                <p><b>Name:</b> <?= $full_name?></p>
+                <p><b>Birth date:</b> <?= $birth_date?></p>
+                <p><b>Biography:</b> <?= $biography?></p>
+                <p><b>Profession:</b> <?= $profession?></p>
+                <p><b>Language:</b> <?= $language?></p>
+                <p><b>Email:</b> <?= $email?></p>
+                <p><b>Phonenumber:</b> <?= $phone_number?></p>
+                <a href="/DDWT18/final/edituser/?user_id=<?= $_SESSION['user_id']?>" class="btn btn-primary">Edit profile</a>
+            </div>
+        </div>
+    </div>
+
 
     <div class="pd-15">&nbsp;</div>
 

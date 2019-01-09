@@ -653,6 +653,98 @@ created!', (get_username($pdo, $_SESSION['user_id'])['full_name']))
 }
 
 /**
+ * Updates a room already in the database
+ * @param object $pdo db object
+ * @param array $room_info POST array
+ * @return array Feedback message
+ */
+function update_user($pdo, $user_info, $user_id) {
+    /* Check if fields are correctly set */
+    if (empty($user_info['username'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Username field empty. Account not updated.'
+        ];
+    } elseif (empty($user_info['fullname'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Full name field empty. Account not updated.'
+        ];
+    } elseif (empty($user_info['birthdate'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Birth date field empty. Account not updated.'
+        ];
+    } elseif (empty($user_info['biography'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Biography field empty. Account not updated.'
+        ];
+    } elseif (empty($user_info['profession'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Profession field empty. Account not updated.'
+        ];
+    } elseif (empty($user_info['language'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Language field empty. Account not updated.'
+        ];
+    } elseif (empty($user_info['email'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Email field empty. Account not updated.'
+        ];
+    } elseif (empty($user_info['phone'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Phone number field empty. Account not updated.'
+        ];
+    }
+
+    /* Check data type*/
+    elseif (!is_numeric($user_info['phone'])){
+        return [
+            'type' => 'danger',
+            'message' => 'Phone number field not numeric. Account not updated.'
+        ];
+    }
+    /* Check who added the room */
+    elseif ( $user_info['user_id'] != $user_id){
+        return [
+            'type' => 'danger',
+            'message' => sprintf("You are not allowed to edit this, since this account was not added by you.")
+        ];
+    }
+
+    /* Update room */
+    else {
+        $stmt = $pdo->prepare("UPDATE users SET username = ?, full_name = ?, birth_date = ?, biography = ?, profession = ?, language = ?, email = ?, phonenumber = ? WHERE id = ?");
+        $stmt->execute([
+            $user_info['username'],
+            $user_info['fullname'],
+            $user_info['birthdate'],
+            $user_info['biography'],
+            $user_info['profession'],
+            $user_info['language'],
+            $user_info['email'],
+            $user_info['phone'],
+            $user_info['user_id']
+        ]);
+        $inserted = $stmt->rowCount();
+        if ($inserted == 1) {
+            return [
+                'type' => 'success',
+                'message' => sprintf("Account succesfully updated!")];
+        }
+    }
+    return [
+        'type' => 'danger',
+        'message' => 'There was an error. Account not updated. Try it again.'
+    ];
+}
+
+/**
  * Creats HTML alert code with information about the success or failure
  * @param bool $type True if success, False if failure
  * @param string $message Error/Success message

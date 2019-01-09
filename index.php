@@ -405,6 +405,16 @@ elseif (new_route('/DDWT18/final/myaccount/', 'get')) {
     }
     /* page info */
     $user = get_username($db, $_SESSION['user_id'])['full_name'];
+    $userinfo = get_userinfo($db, $_SESSION['user_id']);
+    $username = $userinfo['username'];
+    $full_name = $userinfo['full_name'];
+    $birth_date = $userinfo['birth_date'];
+    $biography = $userinfo['biography'];
+    $profession = $userinfo['profession'];
+    $language = $userinfo['language'];
+    $email = $userinfo['email'];
+    $phone_number = $userinfo['phonenumber'];
+
     $page_title = 'My account';
     $breadcrumbs = get_breadcrumbs([
         'DDWT18' => na('/DDWT18/', False),
@@ -459,6 +469,67 @@ elseif (new_route('/DDWT18/final/myaccount/', 'post')) {
     ];
     redirect(sprintf('/DDWT18/final/myaccount/?status=%s',
         json_encode($status)));
+}
+
+elseif (new_route('/DDWT18/final/edituser/', 'get')) {
+    /* Check if logged in */
+    if ( !check_login() ) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To edit rooms you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    /* Get userinfo from database*/
+    $user_id = $_GET['user_id'];
+    $userinfo = get_userinfo($db, $user_id);
+
+    /* Page info */
+    $page_title = 'Edit Account';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT18' => na('/DDWT18/', False),
+        'Final' => na('/DDWT18/final/', False),
+        sprintf("Edit Account") => na('/DDWT18/final/register/', True)
+    ]);
+    $navigation = get_navigation($template, 0);
+
+    /* Page content */
+    $page_subtitle = sprintf("Edit Account of %s", $userinfo['username']);
+    $page_content = 'Edit the account below.';
+    $submit_btn = "Edit Account";
+    $form_action = '/DDWT18/final/edituser/';
+
+    /* Get error message from POST route */
+    if ( isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+
+    /* Choose Template */
+    include use_template('edituser');
+}
+
+/* Edit account POST */
+elseif (new_route('/DDWT18/final/edituser/', 'post')) {
+    /* Check if logged in */
+    if ( !check_login() ) {
+        $error_msg = [
+            'type' => 'warning',
+            'message' => 'To edit rooms you need to be logged in.'
+        ];
+        redirect(sprintf('/DDWT18/final/login/?error_msg=%s',
+            json_encode($error_msg)));
+    }
+    $userinfo = get_userinfo($db, $_SESSION['user_id']);
+    /* Get room info from db */
+    $user_id = $_POST['user_id'];
+
+    /* Update room to database */
+    $feedback = update_user($db, $_POST, $_SESSION['user_id']);
+
+    /* Redirect to room GET route */
+    redirect(sprintf('/DDWT18/final/myaccount/?error_msg=%s', json_encode($feedback)));
+    /* TODO: show error msg after updating */
 }
 
 elseif (new_route('/DDWT18/final/register/', 'get')) {
